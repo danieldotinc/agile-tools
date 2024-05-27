@@ -8,6 +8,11 @@ const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
 
+let stories = [];
+let users = [];
+let currentStoryIndex = 0;
+let revealed = false;
+
 app.prepare().then(() => {
   const server = createServer((req, res) => {
     const parsedUrl = parse(req.url, true);
@@ -15,11 +20,6 @@ app.prepare().then(() => {
   });
 
   const io = socketIo(server);
-
-  let stories = [];
-  let users = [];
-  let currentStoryIndex = 0;
-  let revealed = false;
 
   io.on('connection', socket => {
     console.log('a user connected', socket.id);
