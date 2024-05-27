@@ -7,8 +7,8 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: '*',
-    methods: ['GET', 'POST']
-  }
+    methods: ['GET', 'POST'],
+  },
 });
 
 let stories = [];
@@ -16,13 +16,12 @@ let votes = {};
 let users = [];
 let currentStoryIndex = 0;
 let revealed = false;
-let results = [];
 
-io.on('connection', (socket) => {
+io.on('connection', socket => {
   console.log('a user connected', socket.id);
 
   // Handle user joining
-  socket.on('join', (username) => {
+  socket.on('join', username => {
     if (!users.some(user => user.username === username)) {
       users.push({ id: socket.id, username });
       io.emit('updateUsers', users);
@@ -30,13 +29,11 @@ io.on('connection', (socket) => {
   });
 
   // Send the initial state to the new client
-  socket.emit('init', { stories, votes, currentStoryIndex, revealed, users, results });
+  socket.emit('init', { stories, votes, currentStoryIndex, revealed, users });
 
-  socket.on('addStory', (story) => {
+  socket.on('addStory', story => {
     stories.push(story);
-    results.push(null);
     io.emit('updateStories', stories);
-    io.emit('updateResults', results);
   });
 
   socket.on('vote', ({ username, card }) => {
@@ -53,19 +50,21 @@ io.on('connection', (socket) => {
       return acc;
     }, {});
 
-    const mostVotedValue = Object.keys(voteCounts).reduce((a, b) => voteCounts[a] > voteCounts[b] ? a : b);
+    const mostVotedValue = Object.keys(voteCounts).reduce((a, b) => (voteCounts[a] > voteCounts[b] ? a : b));
 
-    results[currentStoryIndex] = mostVotedValue;
+    stories[currentStoryIndex].result = mostVotedValue;
 
     io.emit('updateRevealed', revealed);
-    io.emit('updateResults', results);
+    io.emit('updateStories', stories);
   });
 
   socket.on('revote', () => {
     votes = {};
     revealed = false;
+    stories[currentStoryIndex].result = null;
     io.emit('updateVotes', votes);
     io.emit('updateRevealed', revealed);
+    io.emit('updateStories', stories);
   });
 
   socket.on('nextStory', () => {

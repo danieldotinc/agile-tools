@@ -1,4 +1,4 @@
-const StoryList = ({ stories, currentStoryIndex, results }) => {
+const StoryList = ({ stories, currentStoryIndex }) => {
   return (
     <div className="w-1/4 p-4 border-r" style={{ flexBasis: '25%' }}>
       <h2 className="text-lg font-bold mb-4">Stories</h2>
@@ -11,10 +11,8 @@ const StoryList = ({ stories, currentStoryIndex, results }) => {
             }`}
           >
             <span>{story.name}</span>
-            {results[index] && (
-              <span className="bg-gray-300 text-black rounded-full px-2 py-1 ml-2">
-                {results[index]}
-              </span>
+            {!!stories[index].result && (
+              <span className="bg-gray-300 text-black rounded-full px-2 py-1 ml-2">{stories[index].result}</span>
             )}
           </li>
         ))}

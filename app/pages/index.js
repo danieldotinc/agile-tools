@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 import PromptName from '../components/PromptName';
@@ -18,7 +18,6 @@ const Home = () => {
   const [votes, setVotes] = useState({});
   const [users, setUsers] = useState([]);
   const [revealed, setRevealed] = useState(false);
-  const [results, setResults] = useState([]);
 
   useEffect(() => {
     const savedName = localStorage.getItem('username');
@@ -28,37 +27,32 @@ const Home = () => {
       socket.emit('join', savedName);
     }
 
-    socket.on('init', ({ stories, votes, currentStoryIndex, revealed, users, results }) => {
+    socket.on('init', ({ stories, votes, currentStoryIndex, revealed, users }) => {
       setStories(stories);
       setVotes(votes);
       setCurrentStoryIndex(currentStoryIndex);
       setRevealed(revealed);
       setUsers(users);
-      setResults(results);
     });
 
-    socket.on('updateStories', (stories) => {
+    socket.on('updateStories', stories => {
       setStories(stories);
     });
 
-    socket.on('updateVotes', (votes) => {
+    socket.on('updateVotes', votes => {
       setVotes(votes);
     });
 
-    socket.on('updateCurrentStoryIndex', (index) => {
+    socket.on('updateCurrentStoryIndex', index => {
       setCurrentStoryIndex(index);
     });
 
-    socket.on('updateRevealed', (revealed) => {
+    socket.on('updateRevealed', revealed => {
       setRevealed(revealed);
     });
 
-    socket.on('updateUsers', (users) => {
+    socket.on('updateUsers', users => {
       setUsers(users);
-    });
-
-    socket.on('updateResults', (results) => {
-      setResults(results);
     });
 
     socket.emit('getStories'); // Fetch stories when page loads
@@ -70,18 +64,17 @@ const Home = () => {
       socket.off('updateCurrentStoryIndex');
       socket.off('updateRevealed');
       socket.off('updateUsers');
-      socket.off('updateResults');
     };
   }, []);
 
-  const handleNameSubmit = (name) => {
+  const handleNameSubmit = name => {
     setUsername(name);
     setIsAdmin(name === admin);
     localStorage.setItem('username', name);
     socket.emit('join', name);
   };
 
-  const handleVote = (card) => {
+  const handleVote = card => {
     if (!isAdmin) {
       socket.emit('vote', { username, card });
     }
@@ -112,7 +105,7 @@ const Home = () => {
   return (
     <div className="min-h-screen flex">
       {!username && <PromptName onNameSubmit={handleNameSubmit} />}
-      <StoryList stories={stories} currentStoryIndex={currentStoryIndex} results={results} />
+      <StoryList stories={stories} currentStoryIndex={currentStoryIndex} />
       <div className="flex-1 flex flex-col p-4">
         {isAdmin && (
           <div className="flex-1 mb-4">
@@ -129,24 +122,11 @@ const Home = () => {
               Next
             </button>
             <div className="mt-4">
-              <input
-                type="text"
-                placeholder="Story Name"
-                className="border p-2 mr-2"
-                id="story-name"
-              />
-              <input
-                type="text"
-                placeholder="Story Link"
-                className="border p-2 mr-2"
-                id="story-link"
-              />
+              <input type="text" placeholder="Story Name" className="border p-2 mr-2" id="story-name" />
+              <input type="text" placeholder="Story Link" className="border p-2 mr-2" id="story-link" />
               <button
                 onClick={() =>
-                  addStory(
-                    document.getElementById('story-name').value,
-                    document.getElementById('story-link').value
-                  )
+                  addStory(document.getElementById('story-name').value, document.getElementById('story-link').value)
                 }
                 className="bg-blue-500 text-white p-2 rounded"
               >
@@ -155,17 +135,15 @@ const Home = () => {
             </div>
           </div>
         )}
-        <div className='flex-1'>
+        <div className="flex-1">
           <h1 className="text-xl font-bold mb-4">
             Current Story: {stories[currentStoryIndex]?.name || 'No story selected'}
           </h1>
         </div>
-        <div className='flex-4'>
+        <div className="flex-4">
           <UserCards users={users} votes={votes} revealed={revealed} />
         </div>
-        <div className='flex-1'>
-          {!isAdmin && !revealed && <VotingCards onVote={handleVote} />}
-        </div>
+        <div className="flex-1">{!isAdmin && !revealed && <VotingCards onVote={handleVote} />}</div>
       </div>
     </div>
   );
