@@ -6,7 +6,7 @@ import StoryList from '../components/StoryList';
 import VotingCards from '../components/VotingCards';
 import UserCards from '../components/UserCards';
 
-const socket = io('http://localhost:3000');
+const socket = io('https://joker-style-6690bd6efa2e.herokuapp.com');
 
 const admin = 'admin'; // Change this to your desired admin identifier
 
