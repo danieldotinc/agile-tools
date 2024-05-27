@@ -99,6 +99,11 @@ const Home = () => {
     socket.emit('prevStory');
   };
 
+  const handleSubmit = (e) =>{
+    e.preventDefault();
+    addStory(document.getElementById('story-name').value, document.getElementById('story-link').value)
+  } 
+
   const addStory = (name, link) => {
     if (String(name).trim()) {
       socket.emit('addStory', { name: String(name).trim(), link });
@@ -131,17 +136,18 @@ const Home = () => {
             <button onClick={deleteStory} className="bg-red-500 text-white p-2 rounded">
               Delete
             </button>
-            <div className="mt-4 flex">
-              <input type="text" placeholder="Story Name" className="flex-1 border p-2 mr-2 rounded" id="story-name" />
-              <input type="text" placeholder="Story Link (optional)" className="flex-1 border p-2 mr-2 rounded" id="story-link" />
+            <div className="mt-4 flex w-3/4">
+            <form onSubmit={handleSubmit} >
+
+              <input type="text" placeholder="Story Name" className="flex-2 border p-2 mr-2 rounded" id="story-name"  />
+              <input type="text" placeholder="Story Link (optional)" className="flex-2 border p-2 mr-2 rounded" id="story-link" />
               <button
-                onClick={() =>
-                  addStory(document.getElementById('story-name').value, document.getElementById('story-link').value)
-                }
-                className="bg-slate-600 text-white p-2 rounded"
-              >
+                type='submit'
+                className=" bg-slate-600 text-white p-2 rounded"
+                >
                 Create
               </button>
+            </form>
             </div>
           </div>
         )}
