@@ -1,8 +1,25 @@
 'use client';
 import { useRouter } from 'next/navigation';
+import io from 'Socket.IO-client';
+import { useEffect } from 'react';
+let socket;
 
 export default function Home() {
   const router = useRouter();
+
+  const socketInitializer = async () => {
+    await fetch('/api/socket');
+    socket = io();
+
+    socket.on('connect', () => {
+      console.log('connected');
+    });
+  };
+
+  useEffect(() => {
+    socketInitializer();
+  }, []);
+
   const exampleMessages = [
     {
       heading: 'Refinement',
