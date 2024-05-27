@@ -7,7 +7,7 @@ const StoryList = ({ stories, currentStoryIndex }) => {
           <li
             key={index}
             className={`mb-2 p-2 rounded flex justify-between items-center ${
-              index === currentStoryIndex ? 'bg-primary text-background' : 'bg-secondary text-white'
+              index === currentStoryIndex ? 'bg-prominent text-background' : 'bg-opposite text-white'
             }`}
           >
             <span>{story.name}</span>

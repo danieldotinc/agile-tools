@@ -98,13 +98,13 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="flex flex-1">
       {!username && <PromptName onNameSubmit={handleNameSubmit} />}
       <StoryList stories={stories} currentStoryIndex={currentStoryIndex} />
       <div className="flex-1 flex flex-col p-4">
         {isAdmin && (
           <div className="flex-1 mb-4">
-            <button onClick={revealVotes} className="mr-2 bg-primary text-background p-2 rounded">
+            <button onClick={revealVotes} className="mr-2 bg-prominent text-background p-2 rounded">
               Reveal
             </button>
             <button onClick={revote} className="mr-2 bg-cyan-600 text-white p-2 rounded">
@@ -131,7 +131,7 @@ const Home = () => {
           </div>
         )}
         <div className="flex-1">
-          <h1 className="text-l font-mono mb-4 rounded bg-secondary text-white p-2 text-center m-6 mx-20">
+          <h1 className="text-l font-mono mb-4 rounded bg-opposite text-white p-2 text-center m-6 mx-20">
             Current Story: {stories[currentStoryIndex]?.name || 'No story selected'}
           </h1>
         </div>
