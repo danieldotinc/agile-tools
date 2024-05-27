@@ -1,4 +1,3 @@
-// server.js
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -14,14 +13,23 @@ const io = new Server(server, {
 
 let stories = [];
 let votes = {};
+let users = [];
 let currentStoryIndex = 0;
 let revealed = false;
 
 io.on('connection', (socket) => {
   console.log('a user connected', socket.id);
 
+  // Handle user joining
+  socket.on('join', (username) => {
+    if (!users.some(user => user.username === username)) {
+      users.push({ id: socket.id, username });
+      io.emit('updateUsers', users);
+    }
+  });
+
   // Send the initial state to the new client
-  socket.emit('init', { stories, votes, currentStoryIndex, revealed });
+  socket.emit('init', { stories, votes, currentStoryIndex, revealed, users });
 
   socket.on('addStory', (story) => {
     stories.push(story);
@@ -68,6 +76,8 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {
+    users = users.filter(user => user.id !== socket.id);
+    io.emit('updateUsers', users);
     console.log('user disconnected', socket.id);
   });
 });

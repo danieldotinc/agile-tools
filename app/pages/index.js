@@ -1,10 +1,10 @@
 "use client";
-
 import { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 import PromptName from '../components/PromptName';
 import StoryList from '../components/StoryList';
 import VotingCards from '../components/VotingCards';
+import UserCards from '../components/UserCards';
 
 const socket = io('http://localhost:3001');
 
@@ -16,6 +16,7 @@ const Home = () => {
   const [stories, setStories] = useState([]);
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
   const [votes, setVotes] = useState({});
+  const [users, setUsers] = useState([]);
   const [revealed, setRevealed] = useState(false);
 
   useEffect(() => {
@@ -23,13 +24,15 @@ const Home = () => {
     if (savedName) {
       setUsername(savedName);
       setIsAdmin(savedName === admin);
+      socket.emit('join', savedName);
     }
 
-    socket.on('init', ({ stories, votes, currentStoryIndex, revealed }) => {
+    socket.on('init', ({ stories, votes, currentStoryIndex, revealed, users }) => {
       setStories(stories);
       setVotes(votes);
       setCurrentStoryIndex(currentStoryIndex);
       setRevealed(revealed);
+      setUsers(users);
     });
 
     socket.on('updateStories', (stories) => {
@@ -48,12 +51,17 @@ const Home = () => {
       setRevealed(revealed);
     });
 
+    socket.on('updateUsers', (users) => {
+      setUsers(users);
+    });
+
     return () => {
       socket.off('init');
       socket.off('updateStories');
       socket.off('updateVotes');
       socket.off('updateCurrentStoryIndex');
       socket.off('updateRevealed');
+      socket.off('updateUsers');
     };
   }, []);
 
@@ -61,10 +69,13 @@ const Home = () => {
     setUsername(name);
     setIsAdmin(name === admin);
     localStorage.setItem('username', name);
+    socket.emit('join', name);
   };
 
   const handleVote = (card) => {
-    socket.emit('vote', { username, card });
+    if (!isAdmin) {
+      socket.emit('vote', { username, card });
+    }
   };
 
   const revealVotes = () => {
@@ -85,6 +96,8 @@ const Home = () => {
 
   const addStory = (name, link) => {
     socket.emit('addStory', { name, link });
+    document.getElementById('story-name').value = '';
+    document.getElementById('story-link').value = '';
   };
 
   return (
@@ -136,20 +149,8 @@ const Home = () => {
         <h1 className="text-xl font-bold mb-4">
           Current Story: {stories[currentStoryIndex]?.name || 'No story selected'}
         </h1>
-        {revealed ? (
-          <div>
-            <h2 className="text-lg font-bold mb-4">Votes:</h2>
-            <ul>
-              {Object.entries(votes).map(([user, vote]) => (
-                <li key={user} className="font-bold text-red-500">
-                  {user}: {vote}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : (
-          <VotingCards onVote={handleVote} />
-        )}
+        <UserCards users={users} votes={votes} revealed={revealed} />
+        {!isAdmin && !revealed && <VotingCards onVote={handleVote} />}
       </div>
     </div>
   );

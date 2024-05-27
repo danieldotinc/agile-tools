@@ -1,16 +1,16 @@
 const StoryList = ({ stories, currentStoryIndex }) => {
   return (
-    <div className="w-1/4 p-4 border-r">
-      <h2 className="font-bold mb-4">User Stories</h2>
+    <div className="w-1/4 p-4 border-r" style={{ width: '25%' }}>
+      <h2 className="text-lg font-bold mb-4">Stories</h2>
       <ul>
         {stories.map((story, index) => (
           <li
             key={index}
-            className={`p-2 mb-2 ${index === currentStoryIndex ? 'bg-blue-100' : ''}`}
+            className={`mb-2 p-2 rounded ${
+              index === currentStoryIndex ? 'bg-blue-500 text-white' : 'bg-gray-100'
+            }`}
           >
-            <a href={story.link} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
-              {story.name}
-            </a>
+            {story.name}
           </li>
         ))}
       </ul>

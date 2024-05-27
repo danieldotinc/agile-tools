@@ -1,25 +1,25 @@
-"use client"
-import { useState, useEffect } from 'react';
+"use client";
+import { useState } from 'react';
 
 const PromptName = ({ onNameSubmit }) => {
   const [name, setName] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    localStorage.setItem('username', name);
-    onNameSubmit(name);
+    if (name) {
+      onNameSubmit(name);
+    }
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-lg">
-        <h2 className="mb-4">Enter your name</h2>
+    <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
+      <form onSubmit={handleSubmit} className="bg-white p-8 rounded shadow-lg">
+        <h2 className="text-2xl mb-4">Enter your name</h2>
         <input
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="border p-2 mb-4 w-full"
-          required
+          className="border p-2 w-full mb-4"
         />
         <button type="submit" className="bg-blue-500 text-white p-2 rounded">
           Submit
