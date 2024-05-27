@@ -16,20 +16,18 @@ module.exports = {
         3: '3 3 0%',
         4: '4 4 0%',
       },
-      colors: {
-        primary: '#fcba03',
-        secondary: 'rgb(51 65 85)',
-        background: '#1A1A1B',
-      },
       fontFamily: {
         sans: ['var(--font-geist-sans)'],
         mono: ['var(--font-geist-mono)'],
       },
       colors: {
+        prominent: '#fcba03',
+        opposite: 'rgb(51 65 85)',
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
         background: 'hsl(var(--background))',
+        // background: '#1A1A1B',
         foreground: 'hsl(var(--foreground))',
         primary: {
           DEFAULT: 'hsl(var(--primary))',
