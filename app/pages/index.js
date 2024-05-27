@@ -18,6 +18,7 @@ const Home = () => {
   const [votes, setVotes] = useState({});
   const [users, setUsers] = useState([]);
   const [revealed, setRevealed] = useState(false);
+  const [results, setResults] = useState([]);
 
   useEffect(() => {
     const savedName = localStorage.getItem('username');
@@ -27,12 +28,13 @@ const Home = () => {
       socket.emit('join', savedName);
     }
 
-    socket.on('init', ({ stories, votes, currentStoryIndex, revealed, users }) => {
+    socket.on('init', ({ stories, votes, currentStoryIndex, revealed, users, results }) => {
       setStories(stories);
       setVotes(votes);
       setCurrentStoryIndex(currentStoryIndex);
       setRevealed(revealed);
       setUsers(users);
+      setResults(results);
     });
 
     socket.on('updateStories', (stories) => {
@@ -55,6 +57,10 @@ const Home = () => {
       setUsers(users);
     });
 
+    socket.on('updateResults', (results) => {
+      setResults(results);
+    });
+
     socket.emit('getStories'); // Fetch stories when page loads
 
     return () => {
@@ -64,6 +70,7 @@ const Home = () => {
       socket.off('updateCurrentStoryIndex');
       socket.off('updateRevealed');
       socket.off('updateUsers');
+      socket.off('updateResults');
     };
   }, []);
 
@@ -105,10 +112,8 @@ const Home = () => {
   return (
     <div className="min-h-screen flex">
       {!username && <PromptName onNameSubmit={handleNameSubmit} />}
-      <div className='flex-1'>
-        <StoryList stories={stories} currentStoryIndex={currentStoryIndex} />
-      </div>
-      <div className="flex-3 p-4">
+      <StoryList stories={stories} currentStoryIndex={currentStoryIndex} results={results} />
+      <div className="flex-1 p-4">
         {isAdmin && (
           <div className="mb-4">
             <button onClick={revealVotes} className="mr-2 bg-green-500 text-white p-2 rounded">

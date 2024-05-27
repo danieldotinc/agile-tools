@@ -16,6 +16,7 @@ let votes = {};
 let users = [];
 let currentStoryIndex = 0;
 let revealed = false;
+let results = [];
 
 io.on('connection', (socket) => {
   console.log('a user connected', socket.id);
@@ -29,11 +30,13 @@ io.on('connection', (socket) => {
   });
 
   // Send the initial state to the new client
-  socket.emit('init', { stories, votes, currentStoryIndex, revealed, users });
+  socket.emit('init', { stories, votes, currentStoryIndex, revealed, users, results });
 
   socket.on('addStory', (story) => {
     stories.push(story);
+    results.push(null);
     io.emit('updateStories', stories);
+    io.emit('updateResults', results);
   });
 
   socket.on('vote', ({ username, card }) => {
@@ -43,7 +46,19 @@ io.on('connection', (socket) => {
 
   socket.on('revealVotes', () => {
     revealed = true;
+
+    // Calculate the most voted value for the current story
+    const voteCounts = Object.values(votes).reduce((acc, vote) => {
+      acc[vote] = (acc[vote] || 0) + 1;
+      return acc;
+    }, {});
+
+    const mostVotedValue = Object.keys(voteCounts).reduce((a, b) => voteCounts[a] > voteCounts[b] ? a : b);
+
+    results[currentStoryIndex] = mostVotedValue;
+
     io.emit('updateRevealed', revealed);
+    io.emit('updateResults', results);
   });
 
   socket.on('revote', () => {
