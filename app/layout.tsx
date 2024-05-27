@@ -29,7 +29,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={cn('font-sans antialiased', GeistSans.variable, GeistMono.variable)}>
         <Providers attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          <div className="flex flex-col min-h-screen bg-gradient-to-b from-muted/30 from-0% to-muted/30 to-50% duration-300 ease-in-out animate-in dark:from-background/10 dark:from-10% dark:to-background/80">
+          <div className="flex flex-col min-h-screen bg-gradient-to-b from-muted/30 from-0% to-muted/30 to-50% duration-300 ease-in-out animate-in">
             <Header />
             <main className="p-5 flex flex-col flex-1 ">{children}</main>
           </div>

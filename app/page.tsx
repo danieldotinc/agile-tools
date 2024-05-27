@@ -40,7 +40,7 @@ export default function Home() {
             {exampleMessages.map((example, index) => (
               <div
                 key={example.heading}
-                className={`cursor-pointer rounded-lg border p-4 hover:bg-zinc-800 dark:bg-zinc-950 dark:hover:bg-zinc-900 ${
+                className={`shadow-lg hover:shadow-3xl cursor-pointer rounded-lg border p-4 hover:bg-zinc-800 ${
                   index > 1 && 'hidden md:block'
                 }`}
                 onClick={() => !!example.link && router.push(example.link)}
