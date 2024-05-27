@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 const VotingCards = ({ onVote }) => {
-  const cards = [0, 0.5, 1, 2, 3, 5, 8, 'Pass'];
+  const cards = [0.5, 1, 2, 3, 5, 8, 'Pass'];
   const [selected, setSelected] = useState(null);
 
   return (

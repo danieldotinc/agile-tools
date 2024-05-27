@@ -143,7 +143,9 @@ const Home = () => {
         <div className="flex-4">
           <UserCards users={users} votes={votes} revealed={revealed} />
         </div>
-        <div className="flex-1">{!isAdmin && !revealed && <VotingCards onVote={handleVote} />}</div>
+        <div className="flex-1">
+          {!isAdmin && !revealed && !stories[currentStoryIndex]?.result && <VotingCards onVote={handleVote} />}
+        </div>
       </div>
     </div>
   );
