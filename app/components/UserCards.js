@@ -1,5 +1,5 @@
-const UserCards = ({ users, votes, revealed }) => {
-  const getColor = (vote) => {
+const UserCards = ({ users, stories, currentIndex, revealed }) => {
+  const getColor = vote => {
     if (revealed) {
       switch (vote) {
         case 0:
@@ -28,16 +28,18 @@ const UserCards = ({ users, votes, revealed }) => {
 
   return (
     <div className="flex justify-center space-x-4 mb-4">
-      {users.map((user) => (
+      {users.map(user => (
         <div
           key={user.id}
           className={`p-4 border rounded ${
-            votes[user.username] ? getColor(votes[user.username]) : 'bg-gray-100'
+            stories[currentIndex].votes[user.username]
+              ? getColor(stories[currentIndex].votes[user.username])
+              : 'bg-gray-100'
           } text-white`}
         >
           <div className="text-center font-bold">{user.username}</div>
-          {revealed && votes[user.username] && (
-            <div className="text-center">{votes[user.username]}</div>
+          {revealed && stories[currentIndex].votes[user.username] && (
+            <div className="text-center">{stories[currentIndex].votes[user.username]}</div>
           )}
         </div>
       ))}

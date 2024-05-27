@@ -15,7 +15,6 @@ const Home = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [stories, setStories] = useState([]);
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
-  const [votes, setVotes] = useState({});
   const [users, setUsers] = useState([]);
   const [revealed, setRevealed] = useState(false);
 
@@ -27,9 +26,8 @@ const Home = () => {
       socket.emit('join', savedName);
     }
 
-    socket.on('init', ({ stories, votes, currentStoryIndex, revealed, users }) => {
+    socket.on('init', ({ stories, currentStoryIndex, revealed, users }) => {
       setStories(stories);
-      setVotes(votes);
       setCurrentStoryIndex(currentStoryIndex);
       setRevealed(revealed);
       setUsers(users);
@@ -37,10 +35,6 @@ const Home = () => {
 
     socket.on('updateStories', stories => {
       setStories(stories);
-    });
-
-    socket.on('updateVotes', votes => {
-      setVotes(votes);
     });
 
     socket.on('updateCurrentStoryIndex', index => {
@@ -60,7 +54,6 @@ const Home = () => {
     return () => {
       socket.off('init');
       socket.off('updateStories');
-      socket.off('updateVotes');
       socket.off('updateCurrentStoryIndex');
       socket.off('updateRevealed');
       socket.off('updateUsers');
@@ -141,10 +134,14 @@ const Home = () => {
           </h1>
         </div>
         <div className="flex-4">
-          <UserCards users={users} votes={votes} revealed={revealed} />
+          {!!stories[currentStoryIndex] && (
+            <UserCards users={users} stories={stories} currentIndex={currentStoryIndex} revealed={revealed} />
+          )}
         </div>
         <div className="flex-1">
-          {!isAdmin && !revealed && !stories[currentStoryIndex]?.result && <VotingCards onVote={handleVote} />}
+          {!!stories.length && !isAdmin && !revealed && !stories[currentStoryIndex]?.result && (
+            <VotingCards onVote={handleVote} story={stories[currentStoryIndex]} username={username} />
+          )}
         </div>
       </div>
     </div>
