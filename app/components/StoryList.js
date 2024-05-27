@@ -1,6 +1,6 @@
-const StoryList = ({ stories, currentStoryIndex }) => {
+const StoryList = ({ stories, currentStoryIndex, isAdmin }) => {
   return (
-    <div className="w-1/4 p-4 border-r" style={{ width: '25%' }}>
+    <div className="w-1/4 p-4 border-r" style={{ minWidth: '200px', maxWidth: '25%' }}>
       <h2 className="text-lg font-bold mb-4">Stories</h2>
       <ul>
         {stories.map((story, index) => (
@@ -14,6 +14,7 @@ const StoryList = ({ stories, currentStoryIndex }) => {
           </li>
         ))}
       </ul>
+      {!isAdmin && stories.length === 0 && <p>No stories available</p>}
     </div>
   );
 };

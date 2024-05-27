@@ -55,6 +55,8 @@ const Home = () => {
       setUsers(users);
     });
 
+    socket.emit('getStories'); // Fetch stories when page loads
+
     return () => {
       socket.off('init');
       socket.off('updateStories');
@@ -103,7 +105,7 @@ const Home = () => {
   return (
     <div className="min-h-screen flex">
       {!username && <PromptName onNameSubmit={handleNameSubmit} />}
-      <StoryList stories={stories} currentStoryIndex={currentStoryIndex} />
+      <StoryList stories={stories} currentStoryIndex={currentStoryIndex} isAdmin={isAdmin} />
       <div className="flex-1 p-4">
         {isAdmin && (
           <div className="mb-4">
