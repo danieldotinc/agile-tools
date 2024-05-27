@@ -7,13 +7,17 @@ const StoryList = ({ stories, currentStoryIndex }) => {
           <li
             key={index}
             className={`mb-2 p-2 rounded flex justify-between items-center ${
-              index === currentStoryIndex ? 'bg-blue-500 text-white' : 'bg-gray-100'
+              index === currentStoryIndex ? 'bg-primary text-background' : 'bg-gray-600 text-white'
             }`}
           >
             <span>{story.name}</span>
-            {!!stories[index].result && (
-              <span className="bg-gray-300 text-black rounded-full px-2 py-1 ml-2">{stories[index].result}</span>
-            )}
+            <span
+              className={`bg-gray-100 ${
+                index === currentStoryIndex ? 'bg-gray-100' : ''
+              } text-black rounded-full px-3 py-1 ml-2`}
+            >
+              {stories[index].result ?? '-'}
+            </span>
           </li>
         ))}
       </ul>

@@ -90,9 +90,11 @@ const Home = () => {
   };
 
   const addStory = (name, link) => {
-    socket.emit('addStory', { name, link });
-    document.getElementById('story-name').value = '';
-    document.getElementById('story-link').value = '';
+    if (String(name).trim()) {
+      socket.emit('addStory', { name: String(name).trim(), link });
+      document.getElementById('story-name').value = '';
+      document.getElementById('story-link').value = '';
+    }
   };
 
   return (
@@ -102,16 +104,16 @@ const Home = () => {
       <div className="flex-1 flex flex-col p-4">
         {isAdmin && (
           <div className="flex-1 mb-4">
-            <button onClick={revealVotes} className="mr-2 bg-green-500 text-white p-2 rounded">
+            <button onClick={revealVotes} className="mr-2 bg-primary text-background p-2 rounded">
               Reveal
             </button>
-            <button onClick={revote} className="mr-2 bg-yellow-500 text-white p-2 rounded">
+            <button onClick={revote} className="mr-2 bg-cyan-600 text-white p-2 rounded">
               Revote
             </button>
-            <button onClick={prevStory} className="mr-2 bg-blue-500 text-white p-2 rounded">
+            <button onClick={prevStory} className="mr-2 bg-gray-400 text-white p-2 rounded">
               Prev
             </button>
-            <button onClick={nextStory} className="bg-blue-500 text-white p-2 rounded">
+            <button onClick={nextStory} className="bg-gray-400 text-white p-2 rounded">
               Next
             </button>
             <div className="mt-4">
@@ -121,7 +123,7 @@ const Home = () => {
                 onClick={() =>
                   addStory(document.getElementById('story-name').value, document.getElementById('story-link').value)
                 }
-                className="bg-blue-500 text-white p-2 rounded"
+                className="bg-slate-600 text-white p-2 rounded"
               >
                 Add Story
               </button>
@@ -129,7 +131,7 @@ const Home = () => {
           </div>
         )}
         <div className="flex-1">
-          <h1 className="text-xl font-bold mb-4">
+          <h1 className="text-l font-mono mb-4 rounded bg-gray-600 text-white p-2 text-center m-6 mx-20">
             Current Story: {stories[currentStoryIndex]?.name || 'No story selected'}
           </h1>
         </div>
