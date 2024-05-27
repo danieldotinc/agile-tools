@@ -1,4 +1,4 @@
-const StoryList = ({ stories, currentStoryIndex }) => {
+const StoryList = ({ stories, currentStoryIndex, onStorySelect, isAdmin }) => {
   return (
     <div className="w-1/4 p-4 border-r" style={{ flexBasis: '25%' }}>
       <h2 className="text-lg font-bold mb-4">Stories</h2>
@@ -6,9 +6,10 @@ const StoryList = ({ stories, currentStoryIndex }) => {
         {stories.map((story, index) => (
           <li
             key={index}
-            className={`mb-2 p-2 rounded flex justify-between items-center ${
+            className={`mb-2 p-2 rounded flex justify-between items-center cursor-pointer ${
               index === currentStoryIndex ? 'bg-prominent text-background' : 'bg-opposite text-white'
             }`}
+            onClick={isAdmin ? () => onStorySelect(index) : null}
           >
             <span>{story.name}</span>
             <span
