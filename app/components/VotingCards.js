@@ -10,7 +10,7 @@ const VotingCards = ({ onVote, story, username }) => {
           className={`w-16 py-8 hover:transition hover:transform hover:-translate-y-6 ${
             story.votes[username] == card ? '-translate-y-6' : ''
           } hover:bg-amber-500 rounded text-xl ${
-            story.votes[username] == card ? 'bg-cyan-600 text-white' : 'bg-primary'
+            story.votes[username] == card ? 'bg-primary' : 'bg-secondary text-white'
           }`}
         >
           {card}

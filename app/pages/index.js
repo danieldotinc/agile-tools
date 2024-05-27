@@ -131,7 +131,7 @@ const Home = () => {
           </div>
         )}
         <div className="flex-1">
-          <h1 className="text-l font-mono mb-4 rounded bg-gray-600 text-white p-2 text-center m-6 mx-20">
+          <h1 className="text-l font-mono mb-4 rounded bg-secondary text-white p-2 text-center m-6 mx-20">
             Current Story: {stories[currentStoryIndex]?.name || 'No story selected'}
           </h1>
         </div>
