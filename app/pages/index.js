@@ -105,8 +105,10 @@ const Home = () => {
   return (
     <div className="min-h-screen flex">
       {!username && <PromptName onNameSubmit={handleNameSubmit} />}
-      <StoryList stories={stories} currentStoryIndex={currentStoryIndex} isAdmin={isAdmin} />
-      <div className="flex-1 p-4">
+      <div className='flex-1'>
+        <StoryList stories={stories} currentStoryIndex={currentStoryIndex} />
+      </div>
+      <div className="flex-3 p-4">
         {isAdmin && (
           <div className="mb-4">
             <button onClick={revealVotes} className="mr-2 bg-green-500 text-white p-2 rounded">

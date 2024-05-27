@@ -1,54 +1,48 @@
-"use client";
-
 const UserCards = ({ users, votes, revealed }) => {
-    const groupedVotes = {};
-    Object.entries(votes).forEach(([user, vote]) => {
-      if (groupedVotes[vote]) {
-        groupedVotes[vote].push(user);
-      } else {
-        groupedVotes[vote] = [user];
+  const getColor = (vote) => {
+    if (revealed) {
+      switch (vote) {
+        case 0:
+          return 'bg-green-500';
+        case 0.5:
+          return 'bg-blue-500';
+        case 1:
+          return 'bg-yellow-500';
+        case 2:
+          return 'bg-orange-500';
+        case 3:
+          return 'bg-purple-500';
+        case 5:
+          return 'bg-red-500';
+        case 8:
+          return 'bg-pink-500';
+        case 'Pass':
+          return 'bg-gray-500';
+        default:
+          return 'bg-gray-100';
       }
-    });
+    } else {
+      return 'bg-red-500';
+    }
+  };
 
-    return (
-        <div className="flex justify-center space-x-4 mb-4">
-          {users.map((user) => (
-            <div
-              key={user.id}
-              className={`p-4 border rounded ${
-                revealed && votes[user.username] ? 'bg-red-500 text-white' : 'bg-gray-100'
-              }`}
-            >
-              <div className="text-center font-bold">{user.username}</div>
-              {revealed && votes[user.username] && (
-                <div className="text-center">{votes[user.username]}</div>
-              )}
-            </div>
-          ))}
-          {revealed &&
-            Object.entries(groupedVotes).map(([vote, users], index) => (
-              <div
-                key={index}
-                className={`p-4 border rounded bg-${getColor(users.length)} text-white`}
-              >
-                <div className="text-center font-bold">{vote}</div>
-                <div className="text-center">{users.join(', ')}</div>
-              </div>
-            ))}
+  return (
+    <div className="flex justify-center space-x-4 mb-4">
+      {users.map((user) => (
+        <div
+          key={user.id}
+          className={`p-4 border rounded ${
+            votes[user.username] ? getColor(votes[user.username]) : 'bg-gray-100'
+          } text-white`}
+        >
+          <div className="text-center font-bold">{user.username}</div>
+          {revealed && votes[user.username] && (
+            <div className="text-center">{votes[user.username]}</div>
+          )}
         </div>
-      );
-    };
-    
-    export default UserCards;
-    
-    // Helper function to determine card color based on the number of users with the same vote
-    const getColor = (count) => {
-      if (count <= 2) {
-        return 'green-500'; // green for 1 or 2 users
-      } else if (count <= 5) {
-        return 'yellow-500'; // yellow for 3 to 5 users
-      } else {
-        return 'red-500'; // red for more than 5 users
-      }
-    };
-    
+      ))}
+    </div>
+  );
+};
+
+export default UserCards;

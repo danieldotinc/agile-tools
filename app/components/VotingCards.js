@@ -1,6 +1,6 @@
-const cards = [0, 0.5, 1, 2, 3, 5, 8, 'Pass'];
-
 const VotingCards = ({ onVote }) => {
+  const cards = [0, 0.5, 1, 2, 3, 5, 8, 'Pass'];
+
   return (
     <div className="flex justify-center space-x-4">
       {cards.map((card) => (
