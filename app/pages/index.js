@@ -113,9 +113,9 @@ const Home = () => {
     <div className="min-h-screen flex">
       {!username && <PromptName onNameSubmit={handleNameSubmit} />}
       <StoryList stories={stories} currentStoryIndex={currentStoryIndex} results={results} />
-      <div className="flex-1 p-4">
+      <div className="flex-1 flex flex-col p-4">
         {isAdmin && (
-          <div className="mb-4">
+          <div className="flex-1 mb-4">
             <button onClick={revealVotes} className="mr-2 bg-green-500 text-white p-2 rounded">
               Reveal
             </button>
@@ -155,11 +155,17 @@ const Home = () => {
             </div>
           </div>
         )}
-        <h1 className="text-xl font-bold mb-4">
-          Current Story: {stories[currentStoryIndex]?.name || 'No story selected'}
-        </h1>
-        <UserCards users={users} votes={votes} revealed={revealed} />
-        {!isAdmin && !revealed && <VotingCards onVote={handleVote} />}
+        <div className='flex-1'>
+          <h1 className="text-xl font-bold mb-4">
+            Current Story: {stories[currentStoryIndex]?.name || 'No story selected'}
+          </h1>
+        </div>
+        <div className='flex-4'>
+          <UserCards users={users} votes={votes} revealed={revealed} />
+        </div>
+        <div className='flex-1'>
+          {!isAdmin && !revealed && <VotingCards onVote={handleVote} />}
+        </div>
       </div>
     </div>
   );
