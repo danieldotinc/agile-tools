@@ -1,18 +1,19 @@
 'use client';
 import { useState, useEffect } from 'react';
-import io from 'socket.io-client';
+import { useRouter } from 'next/router';
+import socket from '@/app/socket';
+import Link from 'next/link';
+
 import PromptName from '../components/PromptName';
 import StoryList from '../components/StoryList';
 import VotingCards from '../components/VotingCards';
 import UserCards from '../components/UserCards';
-import Link from 'next/link';
 
-const socket = io('https://www.jokerway.de/');
-// const socket = io('http://localhost:3000');
-
-const admin = 'admin'; // Change this to your desired admin identifier
+const admin = 'admin';
 
 const Home = () => {
+  const router = useRouter();
+  const { id } = router.query;
   const [username, setUsername] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
   const [stories, setStories] = useState([]);
@@ -27,7 +28,9 @@ const Home = () => {
       socket.emit('join', savedName);
     }
 
-    socket.on('init', ({ stories, currentStoryIndex, users }) => {
+    socket.emit('initStories', { id });
+
+    socket.on('initStories', ({ stories, currentStoryIndex, users }) => {
       setUsers(users);
       setStories(stories);
       setCurrentStoryIndex(currentStoryIndex);
@@ -45,10 +48,8 @@ const Home = () => {
       setUsers(users);
     });
 
-    socket.emit('getStories');
-
     return () => {
-      socket.off('init');
+      socket.off('initStories');
       socket.off('updateUsers');
       socket.off('updateStories');
       socket.off('updateCurrentStoryIndex');
@@ -76,15 +77,11 @@ const Home = () => {
   const revealVotes = () => socket.emit('revealVotes');
   const storySelect = (index) => socket.emit('storySelect', { index });
   const deleteStory = () => socket.emit('deleteStory', { currentStoryIndex });
-  const handleVote = (card) =>
-    !isAdmin ? socket.emit('vote', { username, card }) : null;
+  const handleVote = (card) => (!isAdmin ? socket.emit('vote', { username, card }) : null);
 
   const handleStorySubmit = (e) => {
     e.preventDefault();
-    addStory(
-      document.getElementById('story-name').value,
-      document.getElementById('story-link').value
-    );
+    addStory(document.getElementById('story-name').value, document.getElementById('story-link').value);
   };
 
   return (
@@ -99,36 +96,21 @@ const Home = () => {
       <div className="flex-1 flex flex-col p-4">
         {isAdmin && (
           <div className="flex-1 mb-4">
-            <button
-              onClick={prevStory}
-              className="mr-2 bg-gray-400 text-white p-2 rounded"
-            >
+            <button onClick={prevStory} className="mr-2 bg-gray-400 text-white p-2 rounded">
               {'<'}
             </button>
-            <button
-              onClick={nextStory}
-              className="mr-10 bg-gray-400 text-white p-2 rounded"
-            >
+            <button onClick={nextStory} className="mr-10 bg-gray-400 text-white p-2 rounded">
               {'>'}
             </button>
 
-            <button
-              onClick={revealVotes}
-              className="mr-2 bg-prominent text-background p-2 rounded"
-            >
+            <button onClick={revealVotes} className="mr-2 bg-prominent text-background p-2 rounded">
               Reveal
             </button>
-            <button
-              onClick={revote}
-              className="mr-10 bg-cyan-600 text-white p-2 rounded"
-            >
+            <button onClick={revote} className="mr-10 bg-cyan-600 text-white p-2 rounded">
               Revote
             </button>
 
-            <button
-              onClick={deleteStory}
-              className="bg-red-500 text-white p-2 rounded"
-            >
+            <button onClick={deleteStory} className="bg-red-500 text-white p-2 rounded">
               Delete
             </button>
             <div className="mt-4 flex w-3/4">
@@ -145,10 +127,7 @@ const Home = () => {
                   className="flex-2 border p-2 mr-2 rounded"
                   id="story-link"
                 />
-                <button
-                  type="submit"
-                  className=" bg-slate-600 text-white p-2 rounded"
-                >
+                <button type="submit" className=" bg-slate-600 text-white p-2 rounded">
                   Create
                 </button>
               </form>
@@ -157,8 +136,7 @@ const Home = () => {
         )}
         <div className="flex-1">
           <h1 className="text-l font-mono mb-4 rounded bg-opposite text-white p-2 text-center m-6 mx-20">
-            Current Story:{' '}
-            {stories[currentStoryIndex]?.name || 'No story selected'}
+            Current Story: {stories[currentStoryIndex]?.name || 'No story selected'}
             {!!stories[currentStoryIndex]?.link && (
               <span className="rounded-full bg-prominent p-1 mx-2 text-black text-xs">
                 <Link href={stories[currentStoryIndex]?.link} target="_blank">
@@ -170,11 +148,7 @@ const Home = () => {
         </div>
         <div className="flex-4">
           {!!stories[currentStoryIndex] && (
-            <UserCards
-              users={users}
-              stories={stories}
-              currentIndex={currentStoryIndex}
-            />
+            <UserCards users={users} stories={stories} currentIndex={currentStoryIndex} />
           )}
         </div>
         <div className="flex-1">
@@ -182,11 +156,7 @@ const Home = () => {
             !isAdmin &&
             !stories[currentStoryIndex]?.revealed &&
             !stories[currentStoryIndex]?.result && (
-              <VotingCards
-                onVote={handleVote}
-                story={stories[currentStoryIndex]}
-                username={username}
-              />
+              <VotingCards onVote={handleVote} story={stories[currentStoryIndex]} username={username} />
             )}
         </div>
       </div>

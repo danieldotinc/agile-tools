@@ -9,7 +9,7 @@ export default function Home() {
       heading: 'Refinement',
       subheading: `Do you have some tickets to estimate?`,
       message: `1.create a polling game 2.add user stories 3.share the link`,
-      link: '/poker',
+      link: '/refinement',
       ready: true,
     },
     {

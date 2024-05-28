@@ -9,6 +9,7 @@ const app = next({ dev });
 const handle = app.getRequestHandler();
 
 let stories = [];
+let refinements = [];
 let users = [];
 let currentStoryIndex = 0;
 
@@ -20,22 +21,37 @@ app.prepare().then(() => {
 
   const io = socketIo(server);
 
-  io.on('connection', socket => {
+  io.on('connection', (socket) => {
     console.log('a user connected', socket.id);
 
     // Handle user joining
-    socket.on('join', username => {
-      if (!users.some(user => user.username === username)) {
+    socket.on('join', (username) => {
+      if (!users.some((user) => user.username === username)) {
         users.push({ id: socket.id, username });
         io.emit('updateUsers', users);
       }
     });
 
     // Send the initial state to the new client
-    socket.emit('init', { stories, currentStoryIndex, users });
+    socket.emit('initRefinements', { refinements });
 
-    socket.on('addStory', story => {
-      stories.push({ name: story.name, link: story.link, votes: {}, revealed: false, result: null });
+    socket.on('initStories', ({ id }) => {
+      io.emit('initStories', { stories, currentStoryIndex, users });
+    });
+
+    socket.on('addRefinement', ({ name, id }) => {
+      refinements.unshift({ name, id });
+      io.emit('updateRefinements', refinements);
+    });
+
+    socket.on('addStory', (story) => {
+      stories.push({
+        name: story.name,
+        link: story.link,
+        votes: {},
+        revealed: false,
+        result: null,
+      });
       io.emit('updateStories', stories);
     });
 
@@ -93,14 +109,14 @@ app.prepare().then(() => {
     });
 
     socket.on('disconnect', () => {
-      users = users.filter(user => user.id !== socket.id);
+      users = users.filter((user) => user.id !== socket.id);
       io.emit('updateUsers', users);
       console.log('user disconnected', socket.id);
     });
   });
 
   const PORT = process.env.PORT || 3000;
-  server.listen(PORT, err => {
+  server.listen(PORT, (err) => {
     if (err) throw err;
     console.log(`> Ready on http://localhost:${PORT}`);
   });
