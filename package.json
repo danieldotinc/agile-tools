@@ -1,12 +1,11 @@
 {
-  "name": "planning-poker",
+  "name": "agile-tools",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "go": "node server.js",
-    "dev": "next dev",
+    "dev": "npm run server",
     "build": "next build",
-    "start": "next start",
+    "start": "npm run server",
     "lint": "next lint",
     "server": "node server.js"
   },

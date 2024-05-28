@@ -20,6 +20,9 @@ module.exports = {
         sans: ['var(--font-geist-sans)'],
         mono: ['var(--font-geist-mono)'],
       },
+      boxShadow: {
+        '3xl': '0 35px 60px -15px rgba(100, 90, 0, 0.3)',
+      },
       colors: {
         prominent: '#fcba03',
         opposite: 'rgb(51 65 85)',

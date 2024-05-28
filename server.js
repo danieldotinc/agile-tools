@@ -70,6 +70,19 @@ app.prepare().then(() => {
       io.emit('updateStories', stories);
     });
 
+    socket.on('deleteStory', ({ currentStoryIndex }) => {
+      stories.splice(currentStoryIndex, 1);
+      currentStoryIndex = currentStoryIndex === 0 ? 0 : currentStoryIndex - 1;
+      io.emit('updateStories', stories);
+      io.emit('updateCurrentStoryIndex', currentStoryIndex);
+    });
+
+    socket.on('storySelect', ({ index }) => {
+      revealed = false;
+      io.emit('updateCurrentStoryIndex', index);
+      io.emit('updateRevealed', revealed);
+    });
+
     socket.on('nextStory', () => {
       if (currentStoryIndex < stories.length - 1) {
         currentStoryIndex += 1;

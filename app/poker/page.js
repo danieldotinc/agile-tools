@@ -5,8 +5,10 @@ import PromptName from '../components/PromptName';
 import StoryList from '../components/StoryList';
 import VotingCards from '../components/VotingCards';
 import UserCards from '../components/UserCards';
+import Link from 'next/link';
 
-const socket = io('http://localhost:3000');
+const socket = io('https://www.jokerway.de/');
+// const socket = io('http://localhost:3000');
 
 const admin = 'admin'; // Change this to your desired admin identifier
 
@@ -85,9 +87,22 @@ const Home = () => {
     socket.emit('nextStory');
   };
 
+  const deleteStory = () => {
+    socket.emit('deleteStory', { currentStoryIndex });
+  };
+
+  const storySelect = (index) => {
+    socket.emit('storySelect', { index });
+  };
+
   const prevStory = () => {
     socket.emit('prevStory');
   };
+
+  const handleSubmit = (e) =>{
+    e.preventDefault();
+    addStory(document.getElementById('story-name').value, document.getElementById('story-link').value)
+  } 
 
   const addStory = (name, link) => {
     if (String(name).trim()) {
@@ -100,39 +115,46 @@ const Home = () => {
   return (
     <div className="flex flex-1">
       {!username && <PromptName onNameSubmit={handleNameSubmit} />}
-      <StoryList stories={stories} currentStoryIndex={currentStoryIndex} />
+      <StoryList stories={stories} currentStoryIndex={currentStoryIndex} onStorySelect={storySelect} isAdmin={isAdmin} />
       <div className="flex-1 flex flex-col p-4">
         {isAdmin && (
           <div className="flex-1 mb-4">
+            <button onClick={prevStory} className="mr-2 bg-gray-400 text-white p-2 rounded">
+              {"<"}
+            </button>
+            <button onClick={nextStory} className="mr-10 bg-gray-400 text-white p-2 rounded">
+              {'>'}
+            </button>
+
             <button onClick={revealVotes} className="mr-2 bg-prominent text-background p-2 rounded">
               Reveal
             </button>
-            <button onClick={revote} className="mr-2 bg-cyan-600 text-white p-2 rounded">
+            <button onClick={revote} className="mr-10 bg-cyan-600 text-white p-2 rounded">
               Revote
             </button>
-            <button onClick={prevStory} className="mr-2 bg-gray-400 text-white p-2 rounded">
-              Prev
+            
+            <button onClick={deleteStory} className="bg-red-500 text-white p-2 rounded">
+              Delete
             </button>
-            <button onClick={nextStory} className="bg-gray-400 text-white p-2 rounded">
-              Next
-            </button>
-            <div className="mt-4">
-              <input type="text" placeholder="Story Name" className="border p-2 mr-2" id="story-name" />
-              <input type="text" placeholder="Story Link" className="border p-2 mr-2" id="story-link" />
+            <div className="mt-4 flex w-3/4">
+            <form onSubmit={handleSubmit} >
+
+              <input type="text" placeholder="Story Name" className="flex-2 border p-2 mr-2 rounded" id="story-name"  />
+              <input type="text" placeholder="Story Link (optional)" className="flex-2 border p-2 mr-2 rounded" id="story-link" />
               <button
-                onClick={() =>
-                  addStory(document.getElementById('story-name').value, document.getElementById('story-link').value)
-                }
-                className="bg-slate-600 text-white p-2 rounded"
-              >
-                Add Story
+                type='submit'
+                className=" bg-slate-600 text-white p-2 rounded"
+                >
+                Create
               </button>
+            </form>
             </div>
           </div>
         )}
         <div className="flex-1">
           <h1 className="text-l font-mono mb-4 rounded bg-opposite text-white p-2 text-center m-6 mx-20">
             Current Story: {stories[currentStoryIndex]?.name || 'No story selected'}
+          {!!stories[currentStoryIndex]?.link && <span className='rounded-full bg-prominent p-1 mx-2 text-black text-xs'><Link href={stories[currentStoryIndex]?.link} target="_blank">jira</Link></span>}
           </h1>
         </div>
         <div className="flex-4">
