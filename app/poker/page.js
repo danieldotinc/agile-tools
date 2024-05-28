@@ -18,7 +18,6 @@ const Home = () => {
   const [stories, setStories] = useState([]);
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
   const [users, setUsers] = useState([]);
-  const [revealed, setRevealed] = useState(false);
 
   useEffect(() => {
     const savedName = localStorage.getItem('username');
@@ -28,81 +27,40 @@ const Home = () => {
       socket.emit('join', savedName);
     }
 
-    socket.on('init', ({ stories, currentStoryIndex, revealed, users }) => {
+    socket.on('init', ({ stories, currentStoryIndex, users }) => {
+      setUsers(users);
       setStories(stories);
       setCurrentStoryIndex(currentStoryIndex);
-      setRevealed(revealed);
-      setUsers(users);
     });
 
-    socket.on('updateStories', stories => {
+    socket.on('updateStories', (stories) => {
       setStories(stories);
     });
 
-    socket.on('updateCurrentStoryIndex', index => {
+    socket.on('updateCurrentStoryIndex', (index) => {
       setCurrentStoryIndex(index);
     });
 
-    socket.on('updateRevealed', revealed => {
-      setRevealed(revealed);
-    });
-
-    socket.on('updateUsers', users => {
+    socket.on('updateUsers', (users) => {
       setUsers(users);
     });
 
-    socket.emit('getStories'); // Fetch stories when page loads
+    socket.emit('getStories');
 
     return () => {
       socket.off('init');
+      socket.off('updateUsers');
       socket.off('updateStories');
       socket.off('updateCurrentStoryIndex');
-      socket.off('updateRevealed');
-      socket.off('updateUsers');
     };
   }, []);
 
-  const handleNameSubmit = name => {
+  const handleNameSubmit = (name) => {
     setUsername(name);
     setIsAdmin(name === admin);
     localStorage.setItem('username', name);
     socket.emit('join', name);
   };
-
-  const handleVote = card => {
-    if (!isAdmin) {
-      socket.emit('vote', { username, card });
-    }
-  };
-
-  const revealVotes = () => {
-    socket.emit('revealVotes');
-  };
-
-  const revote = () => {
-    socket.emit('revote');
-  };
-
-  const nextStory = () => {
-    socket.emit('nextStory');
-  };
-
-  const deleteStory = () => {
-    socket.emit('deleteStory', { currentStoryIndex });
-  };
-
-  const storySelect = (index) => {
-    socket.emit('storySelect', { index });
-  };
-
-  const prevStory = () => {
-    socket.emit('prevStory');
-  };
-
-  const handleSubmit = (e) =>{
-    e.preventDefault();
-    addStory(document.getElementById('story-name').value, document.getElementById('story-link').value)
-  } 
 
   const addStory = (name, link) => {
     if (String(name).trim()) {
@@ -112,60 +70,124 @@ const Home = () => {
     }
   };
 
+  const revote = () => socket.emit('revote');
+  const nextStory = () => socket.emit('nextStory');
+  const prevStory = () => socket.emit('prevStory');
+  const revealVotes = () => socket.emit('revealVotes');
+  const storySelect = (index) => socket.emit('storySelect', { index });
+  const deleteStory = () => socket.emit('deleteStory', { currentStoryIndex });
+  const handleVote = (card) =>
+    !isAdmin ? socket.emit('vote', { username, card }) : null;
+
+  const handleStorySubmit = (e) => {
+    e.preventDefault();
+    addStory(
+      document.getElementById('story-name').value,
+      document.getElementById('story-link').value
+    );
+  };
+
   return (
     <div className="flex flex-1">
       {!username && <PromptName onNameSubmit={handleNameSubmit} />}
-      <StoryList stories={stories} currentStoryIndex={currentStoryIndex} onStorySelect={storySelect} isAdmin={isAdmin} />
+      <StoryList
+        stories={stories}
+        currentStoryIndex={currentStoryIndex}
+        onStorySelect={storySelect}
+        isAdmin={isAdmin}
+      />
       <div className="flex-1 flex flex-col p-4">
         {isAdmin && (
           <div className="flex-1 mb-4">
-            <button onClick={prevStory} className="mr-2 bg-gray-400 text-white p-2 rounded">
-              {"<"}
+            <button
+              onClick={prevStory}
+              className="mr-2 bg-gray-400 text-white p-2 rounded"
+            >
+              {'<'}
             </button>
-            <button onClick={nextStory} className="mr-10 bg-gray-400 text-white p-2 rounded">
+            <button
+              onClick={nextStory}
+              className="mr-10 bg-gray-400 text-white p-2 rounded"
+            >
               {'>'}
             </button>
 
-            <button onClick={revealVotes} className="mr-2 bg-prominent text-background p-2 rounded">
+            <button
+              onClick={revealVotes}
+              className="mr-2 bg-prominent text-background p-2 rounded"
+            >
               Reveal
             </button>
-            <button onClick={revote} className="mr-10 bg-cyan-600 text-white p-2 rounded">
+            <button
+              onClick={revote}
+              className="mr-10 bg-cyan-600 text-white p-2 rounded"
+            >
               Revote
             </button>
-            
-            <button onClick={deleteStory} className="bg-red-500 text-white p-2 rounded">
+
+            <button
+              onClick={deleteStory}
+              className="bg-red-500 text-white p-2 rounded"
+            >
               Delete
             </button>
             <div className="mt-4 flex w-3/4">
-            <form onSubmit={handleSubmit} >
-
-              <input type="text" placeholder="Story Name" className="flex-2 border p-2 mr-2 rounded" id="story-name"  />
-              <input type="text" placeholder="Story Link (optional)" className="flex-2 border p-2 mr-2 rounded" id="story-link" />
-              <button
-                type='submit'
-                className=" bg-slate-600 text-white p-2 rounded"
+              <form onSubmit={handleStorySubmit}>
+                <input
+                  type="text"
+                  placeholder="Story Name"
+                  className="flex-2 border p-2 mr-2 rounded"
+                  id="story-name"
+                />
+                <input
+                  type="text"
+                  placeholder="Story Link (optional)"
+                  className="flex-2 border p-2 mr-2 rounded"
+                  id="story-link"
+                />
+                <button
+                  type="submit"
+                  className=" bg-slate-600 text-white p-2 rounded"
                 >
-                Create
-              </button>
-            </form>
+                  Create
+                </button>
+              </form>
             </div>
           </div>
         )}
         <div className="flex-1">
           <h1 className="text-l font-mono mb-4 rounded bg-opposite text-white p-2 text-center m-6 mx-20">
-            Current Story: {stories[currentStoryIndex]?.name || 'No story selected'}
-          {!!stories[currentStoryIndex]?.link && <span className='rounded-full bg-prominent p-1 mx-2 text-black text-xs'><Link href={stories[currentStoryIndex]?.link} target="_blank">jira</Link></span>}
+            Current Story:{' '}
+            {stories[currentStoryIndex]?.name || 'No story selected'}
+            {!!stories[currentStoryIndex]?.link && (
+              <span className="rounded-full bg-prominent p-1 mx-2 text-black text-xs">
+                <Link href={stories[currentStoryIndex]?.link} target="_blank">
+                  jira
+                </Link>
+              </span>
+            )}
           </h1>
         </div>
         <div className="flex-4">
           {!!stories[currentStoryIndex] && (
-            <UserCards users={users} stories={stories} currentIndex={currentStoryIndex} revealed={revealed} />
+            <UserCards
+              users={users}
+              stories={stories}
+              currentIndex={currentStoryIndex}
+            />
           )}
         </div>
         <div className="flex-1">
-          {!!stories.length && !isAdmin && !revealed && !stories[currentStoryIndex]?.result && (
-            <VotingCards onVote={handleVote} story={stories[currentStoryIndex]} username={username} />
-          )}
+          {!!stories.length &&
+            !isAdmin &&
+            !stories[currentStoryIndex]?.revealed &&
+            !stories[currentStoryIndex]?.result && (
+              <VotingCards
+                onVote={handleVote}
+                story={stories[currentStoryIndex]}
+                username={username}
+              />
+            )}
         </div>
       </div>
     </div>

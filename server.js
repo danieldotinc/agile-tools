@@ -11,7 +11,6 @@ const handle = app.getRequestHandler();
 let stories = [];
 let users = [];
 let currentStoryIndex = 0;
-let revealed = false;
 
 app.prepare().then(() => {
   const server = createServer((req, res) => {
@@ -33,10 +32,10 @@ app.prepare().then(() => {
     });
 
     // Send the initial state to the new client
-    socket.emit('init', { stories, currentStoryIndex, revealed, users });
+    socket.emit('init', { stories, currentStoryIndex, users });
 
     socket.on('addStory', story => {
-      stories.push({ name: story.name, link: story.link, votes: {}, result: null });
+      stories.push({ name: story.name, link: story.link, votes: {}, revealed: false, result: null });
       io.emit('updateStories', stories);
     });
 
@@ -46,7 +45,7 @@ app.prepare().then(() => {
     });
 
     socket.on('revealVotes', () => {
-      revealed = true;
+      stories[currentStoryIndex].revealed = true;
 
       // Calculate the most voted value for the current story
       const voteCounts = Object.values(stories[currentStoryIndex].votes).reduce((acc, vote) => {
@@ -55,18 +54,16 @@ app.prepare().then(() => {
       }, {});
 
       const mostVotedValue = Object.keys(voteCounts).reduce((a, b) => (voteCounts[a] > voteCounts[b] ? a : b));
-
       stories[currentStoryIndex].result = mostVotedValue;
 
-      io.emit('updateRevealed', revealed);
       io.emit('updateStories', stories);
     });
 
     socket.on('revote', () => {
       stories[currentStoryIndex].votes = {};
-      revealed = false;
       stories[currentStoryIndex].result = null;
-      io.emit('updateRevealed', revealed);
+      stories[currentStoryIndex].revealed = false;
+
       io.emit('updateStories', stories);
     });
 
@@ -78,26 +75,20 @@ app.prepare().then(() => {
     });
 
     socket.on('storySelect', ({ index }) => {
-      revealed = false;
       io.emit('updateCurrentStoryIndex', index);
-      io.emit('updateRevealed', revealed);
     });
 
     socket.on('nextStory', () => {
       if (currentStoryIndex < stories.length - 1) {
         currentStoryIndex += 1;
-        revealed = false;
         io.emit('updateCurrentStoryIndex', currentStoryIndex);
-        io.emit('updateRevealed', revealed);
       }
     });
 
     socket.on('prevStory', () => {
       if (currentStoryIndex > 0) {
         currentStoryIndex -= 1;
-        revealed = false;
         io.emit('updateCurrentStoryIndex', currentStoryIndex);
-        io.emit('updateRevealed', revealed);
       }
     });
 
