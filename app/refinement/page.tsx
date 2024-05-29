@@ -20,12 +20,14 @@ const Page = () => {
       socket.emit('join', savedName);
     }
 
-    socket.on('initRefinements', ({ refinements }) => {
-      setRefinements(refinements.reverse());
+    socket.emit('getRefinements');
+
+    socket.on('initRefinements', (list) => {
+      setRefinements(list);
     });
 
     socket.on('updateRefinements', (refinements) => {
-      setRefinements(refinements.reverse());
+      setRefinements(refinements);
     });
 
     return () => {

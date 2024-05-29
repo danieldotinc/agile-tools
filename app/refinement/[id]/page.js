@@ -1,24 +1,22 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
 import socket from '@/app/socket';
 import Link from 'next/link';
 
-import PromptName from '../components/PromptName';
-import StoryList from '../components/StoryList';
-import VotingCards from '../components/VotingCards';
-import UserCards from '../components/UserCards';
+import PromptName from '../../components/PromptName';
+import StoryList from '../../components/StoryList';
+import VotingCards from '../../components/VotingCards';
+import UserCards from '../../components/UserCards';
 
 const admin = 'admin';
 
-const Home = () => {
-  const router = useRouter();
-  const { id } = router.query;
+const Home = ({ params }) => {
+  const { id } = params;
+
+  const [users, setUsers] = useState([]);
   const [username, setUsername] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
-  const [stories, setStories] = useState([]);
-  const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
-  const [users, setUsers] = useState([]);
+  const [refinement, setRefinement] = useState(null);
 
   useEffect(() => {
     const savedName = localStorage.getItem('username');
@@ -28,20 +26,15 @@ const Home = () => {
       socket.emit('join', savedName);
     }
 
-    socket.emit('initStories', { id });
+    socket.emit('getRefinement', { id });
 
-    socket.on('initStories', ({ stories, currentStoryIndex, users }) => {
+    socket.on('initRefinement', ({ refinement, users }) => {
       setUsers(users);
-      setStories(stories);
-      setCurrentStoryIndex(currentStoryIndex);
+      setRefinement(refinement);
     });
 
-    socket.on('updateStories', (stories) => {
-      setStories(stories);
-    });
-
-    socket.on('updateCurrentStoryIndex', (index) => {
-      setCurrentStoryIndex(index);
+    socket.on('updateRefinement', (refinement) => {
+      setRefinement(refinement);
     });
 
     socket.on('updateUsers', (users) => {
@@ -49,10 +42,9 @@ const Home = () => {
     });
 
     return () => {
-      socket.off('initStories');
       socket.off('updateUsers');
-      socket.off('updateStories');
-      socket.off('updateCurrentStoryIndex');
+      socket.off('initRefinement');
+      socket.off('updateRefinement');
     };
   }, []);
 
@@ -65,19 +57,19 @@ const Home = () => {
 
   const addStory = (name, link) => {
     if (String(name).trim()) {
-      socket.emit('addStory', { name: String(name).trim(), link });
+      socket.emit('addStory', { refinementId: id, name: String(name).trim(), link });
       document.getElementById('story-name').value = '';
       document.getElementById('story-link').value = '';
     }
   };
 
-  const revote = () => socket.emit('revote');
-  const nextStory = () => socket.emit('nextStory');
-  const prevStory = () => socket.emit('prevStory');
-  const revealVotes = () => socket.emit('revealVotes');
-  const storySelect = (index) => socket.emit('storySelect', { index });
-  const deleteStory = () => socket.emit('deleteStory', { currentStoryIndex });
-  const handleVote = (card) => (!isAdmin ? socket.emit('vote', { username, card }) : null);
+  const revote = () => socket.emit('revote', { refinementId: id });
+  const prevStory = () => socket.emit('prevStory', { refinementId: id });
+  const storySelect = (index) => socket.emit('storySelect', { refinementId: id, index });
+  const nextStory = () => socket.emit('nextStory', { refinementId: id });
+  const revealVotes = () => socket.emit('revealVotes', { refinementId: id });
+  const deleteStory = () => socket.emit('deleteStory', { refinementId: id, index: refinement?.currentIndex });
+  const handleVote = (card) => (!isAdmin ? socket.emit('vote', { refinementId: id, username, card }) : null);
 
   const handleStorySubmit = (e) => {
     e.preventDefault();
@@ -87,12 +79,7 @@ const Home = () => {
   return (
     <div className="flex flex-1">
       {!username && <PromptName onNameSubmit={handleNameSubmit} />}
-      <StoryList
-        stories={stories}
-        currentStoryIndex={currentStoryIndex}
-        onStorySelect={storySelect}
-        isAdmin={isAdmin}
-      />
+      <StoryList isAdmin={isAdmin} refinement={refinement} onStorySelect={storySelect} />
       <div className="flex-1 flex flex-col p-4">
         {isAdmin && (
           <div className="flex-1 mb-4">
@@ -136,10 +123,10 @@ const Home = () => {
         )}
         <div className="flex-1">
           <h1 className="text-l font-mono mb-4 rounded bg-opposite text-white p-2 text-center m-6 mx-20">
-            Current Story: {stories[currentStoryIndex]?.name || 'No story selected'}
-            {!!stories[currentStoryIndex]?.link && (
+            Current Story: {refinement?.stories[refinement?.currentIndex]?.name || 'No story selected'}
+            {!!refinement?.stories[refinement?.currentIndex]?.link && (
               <span className="rounded-full bg-prominent p-1 mx-2 text-black text-xs">
-                <Link href={stories[currentStoryIndex]?.link} target="_blank">
+                <Link href={refinement?.stories[refinement?.currentIndex]?.link} target="_blank">
                   jira
                 </Link>
               </span>
@@ -147,16 +134,20 @@ const Home = () => {
           </h1>
         </div>
         <div className="flex-4">
-          {!!stories[currentStoryIndex] && (
-            <UserCards users={users} stories={stories} currentIndex={currentStoryIndex} />
+          {!!refinement?.stories[refinement?.currentIndex] && (
+            <UserCards users={users} stories={refinement?.stories} currentIndex={refinement?.currentIndex} />
           )}
         </div>
         <div className="flex-1">
-          {!!stories.length &&
+          {!!refinement?.stories.length &&
             !isAdmin &&
-            !stories[currentStoryIndex]?.revealed &&
-            !stories[currentStoryIndex]?.result && (
-              <VotingCards onVote={handleVote} story={stories[currentStoryIndex]} username={username} />
+            !refinement?.stories[refinement?.currentIndex]?.revealed &&
+            !refinement?.stories[refinement?.currentIndex]?.result && (
+              <VotingCards
+                onVote={handleVote}
+                story={refinement?.stories[refinement?.currentIndex]}
+                username={username}
+              />
             )}
         </div>
       </div>

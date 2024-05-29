@@ -8,10 +8,8 @@ const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
 
-let stories = [];
-let refinements = [];
 let users = [];
-let currentStoryIndex = 0;
+let refinements = [];
 
 app.prepare().then(() => {
   const server = createServer((req, res) => {
@@ -32,79 +30,114 @@ app.prepare().then(() => {
       }
     });
 
-    // Send the initial state to the new client
-    socket.emit('initRefinements', { refinements });
+    socket.on('getRefinements', () => {
+      io.emit('initRefinements', refinements);
+    });
 
-    socket.on('initStories', ({ id }) => {
-      io.emit('initStories', { stories, currentStoryIndex, users });
+    socket.on('getRefinement', ({ id }) => {
+      const refinement = refinements.find((ref) => ref.id === id);
+      if (refinement) io.emit('initRefinement', { refinement, users });
     });
 
     socket.on('addRefinement', ({ name, id }) => {
-      refinements.unshift({ name, id });
+      refinements.unshift({ name, id, stories: [], currentIndex: 0 });
       io.emit('updateRefinements', refinements);
     });
 
     socket.on('addStory', (story) => {
-      stories.push({
-        name: story.name,
-        link: story.link,
-        votes: {},
-        revealed: false,
-        result: null,
-      });
-      io.emit('updateStories', stories);
+      const refinementIndex = refinements.findIndex((ref) => ref.id === story.refinementId);
+      const refinement = refinements[refinementIndex];
+      if (refinement) {
+        refinement.stories.push({
+          name: story.name,
+          link: story.link,
+          votes: {},
+          revealed: false,
+          result: null,
+        });
+        io.emit('updateRefinement', refinement);
+      }
     });
 
-    socket.on('vote', ({ username, card }) => {
-      stories[currentStoryIndex].votes[username] = card;
-      io.emit('updateStories', stories);
+    socket.on('vote', ({ refinementId, username, card }) => {
+      const refinementIndex = refinements.findIndex((ref) => ref.id === refinementId);
+      const refinement = refinements[refinementIndex];
+      if (refinement) {
+        refinement.stories[refinement.currentIndex].votes[username] = card;
+        io.emit('updateRefinement', refinement);
+      }
     });
 
-    socket.on('revealVotes', () => {
-      stories[currentStoryIndex].revealed = true;
+    socket.on('revealVotes', ({ refinementId }) => {
+      const refinementIndex = refinements.findIndex((ref) => ref.id === refinementId);
+      const refinement = refinements[refinementIndex];
+      if (!refinement) return;
+      refinement.stories[refinement.currentIndex].revealed = true;
 
       // Calculate the most voted value for the current story
-      const voteCounts = Object.values(stories[currentStoryIndex].votes).reduce((acc, vote) => {
+      const voteCounts = Object.values(refinement.stories[refinement.currentIndex].votes).reduce((acc, vote) => {
         acc[vote] = (acc[vote] || 0) + 1;
         return acc;
       }, {});
 
       const mostVotedValue = Object.keys(voteCounts).reduce((a, b) => (voteCounts[a] > voteCounts[b] ? a : b));
-      stories[currentStoryIndex].result = mostVotedValue;
+      refinement.stories[refinement.currentIndex].result = mostVotedValue;
 
-      io.emit('updateStories', stories);
+      io.emit('updateRefinement', refinement);
     });
 
-    socket.on('revote', () => {
-      stories[currentStoryIndex].votes = {};
-      stories[currentStoryIndex].result = null;
-      stories[currentStoryIndex].revealed = false;
+    socket.on('revote', ({ refinementId }) => {
+      const refinementIndex = refinements.findIndex((ref) => ref.id === refinementId);
+      const refinement = refinements[refinementIndex];
+      if (!refinement) return;
 
-      io.emit('updateStories', stories);
+      refinement.stories[refinement.currentIndex].votes = {};
+      refinement.stories[refinement.currentIndex].result = null;
+      refinement.stories[refinement.currentIndex].revealed = false;
+
+      io.emit('updateRefinement', refinement);
     });
 
-    socket.on('deleteStory', ({ currentStoryIndex }) => {
-      stories.splice(currentStoryIndex, 1);
-      currentStoryIndex = currentStoryIndex === 0 ? 0 : currentStoryIndex - 1;
-      io.emit('updateStories', stories);
-      io.emit('updateCurrentStoryIndex', currentStoryIndex);
+    socket.on('deleteStory', ({ refinementId, index }) => {
+      const refinementIndex = refinements.findIndex((ref) => ref.id === refinementId);
+      const refinement = refinements[refinementIndex];
+      if (!refinement) return;
+
+      refinement.stories.splice(index, 1);
+      refinement.currentIndex = index === 0 ? 0 : refinement.currentIndex - 1;
+
+      io.emit('updateRefinement', refinement);
     });
 
-    socket.on('storySelect', ({ index }) => {
-      io.emit('updateCurrentStoryIndex', index);
+    socket.on('storySelect', ({ refinementId, index }) => {
+      const refinementIndex = refinements.findIndex((ref) => ref.id === refinementId);
+      const refinement = refinements[refinementIndex];
+      if (!refinement) return;
+
+      refinement.currentIndex = index;
+
+      io.emit('updateRefinement', refinement);
     });
 
-    socket.on('nextStory', () => {
-      if (currentStoryIndex < stories.length - 1) {
-        currentStoryIndex += 1;
-        io.emit('updateCurrentStoryIndex', currentStoryIndex);
+    socket.on('nextStory', ({ refinementId }) => {
+      const refinementIndex = refinements.findIndex((ref) => ref.id === refinementId);
+      const refinement = refinements[refinementIndex];
+      if (!refinement) return;
+
+      if (refinement.currentIndex < refinement.stories.length - 1) {
+        refinement.currentIndex += 1;
+        io.emit('updateRefinement', refinement);
       }
     });
 
-    socket.on('prevStory', () => {
-      if (currentStoryIndex > 0) {
-        currentStoryIndex -= 1;
-        io.emit('updateCurrentStoryIndex', currentStoryIndex);
+    socket.on('prevStory', ({ refinementId }) => {
+      const refinementIndex = refinements.findIndex((ref) => ref.id === refinementId);
+      const refinement = refinements[refinementIndex];
+      if (!refinement) return;
+
+      if (refinement.currentIndex > 0) {
+        refinement.currentIndex -= 1;
+        io.emit('updateRefinement', refinement);
       }
     });
 

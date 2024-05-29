@@ -17,10 +17,8 @@ const UserCards = ({ users, stories, currentIndex }) => {
           <div key={user.id} className={`p-2 text-dark`}>
             <div className="text-center font-normal">{user.username}</div>
             <Image
-              src={`/assets/${getCard(
-                stories[currentIndex].votes[user.username]
-              )}.png`}
-              className="w-24"
+              src={`/assets/${getCard(stories[currentIndex].votes[user.username])}.png`}
+              className="w-24 h-32"
               width={175}
               height={300}
               alt="vote"
