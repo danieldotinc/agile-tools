@@ -23,10 +23,14 @@ app.prepare().then(() => {
     console.log('a user connected', socket.id);
 
     // Handle user joining
-    socket.on('join', (username) => {
-      if (!users.some((user) => user.username === username)) {
-        users.push({ id: socket.id, username });
-        io.emit('updateUsers', users);
+    socket.on('join', ({ username, refinementId }) => {
+      const refinementIndex = refinements.findIndex((ref) => ref.id === refinementId);
+      const refinement = refinements[refinementIndex];
+      if (!refinement) return;
+
+      if (!refinement.users.some((user) => user.username === username)) {
+        refinement.users.push({ id: socket.id, username });
+        io.emit('updateRefinement', refinement);
       }
     });
 
@@ -36,11 +40,11 @@ app.prepare().then(() => {
 
     socket.on('getRefinement', ({ id }) => {
       const refinement = refinements.find((ref) => ref.id === id);
-      if (refinement) io.emit('initRefinement', { refinement, users });
+      if (refinement) io.emit('initRefinement', { refinement });
     });
 
     socket.on('addRefinement', ({ name, id }) => {
-      refinements.unshift({ name, id, stories: [], currentIndex: 0 });
+      refinements.unshift({ name, id, stories: [], currentIndex: 0, users: [] });
       io.emit('updateRefinements', refinements);
     });
 
@@ -142,9 +146,11 @@ app.prepare().then(() => {
     });
 
     socket.on('disconnect', () => {
-      users = users.filter((user) => user.id !== socket.id);
-      io.emit('updateUsers', users);
-      console.log('user disconnected', socket.id);
+      for (let refinement of refinements) {
+        refinement.users = refinement.users.filter((user) => user.id !== socket.id);
+        io.emit('updateRefinements', refinements);
+        console.log('user disconnected', socket.id);
+      }
     });
   });
 

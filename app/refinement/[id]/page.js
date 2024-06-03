@@ -3,33 +3,24 @@ import { useState, useEffect } from 'react';
 import socket from '@/app/socket';
 import Link from 'next/link';
 
-import PromptName from '../../components/PromptName';
 import StoryList from '../../components/StoryList';
 import VotingCards from '../../components/VotingCards';
 import UserCards from '../../components/UserCards';
 
-const admin = 'admin';
+import { useAuthContext } from '@/app/context/AuthContext';
 
 const Home = ({ params }) => {
   const { id } = params;
+  const { username, isAdmin } = useAuthContext();
 
-  const [users, setUsers] = useState([]);
-  const [username, setUsername] = useState('');
-  const [isAdmin, setIsAdmin] = useState(false);
   const [refinement, setRefinement] = useState(null);
 
   useEffect(() => {
-    const savedName = localStorage.getItem('username');
-    if (savedName) {
-      setUsername(savedName);
-      setIsAdmin(savedName === admin);
-      socket.emit('join', savedName);
-    }
-
     socket.emit('getRefinement', { id });
 
-    socket.on('initRefinement', ({ refinement, users }) => {
-      setUsers(users);
+    if (username) socket.emit('join', { username, refinementId: id });
+
+    socket.on('initRefinement', ({ refinement }) => {
       setRefinement(refinement);
     });
 
@@ -37,23 +28,11 @@ const Home = ({ params }) => {
       setRefinement(refinement);
     });
 
-    socket.on('updateUsers', (users) => {
-      setUsers(users);
-    });
-
     return () => {
-      socket.off('updateUsers');
       socket.off('initRefinement');
       socket.off('updateRefinement');
     };
-  }, []);
-
-  const handleNameSubmit = (name) => {
-    setUsername(name);
-    setIsAdmin(name === admin);
-    localStorage.setItem('username', name);
-    socket.emit('join', name);
-  };
+  }, [username]);
 
   const addStory = (name, link) => {
     if (String(name).trim()) {
@@ -78,7 +57,6 @@ const Home = ({ params }) => {
 
   return (
     <div className="flex flex-1">
-      {!username && <PromptName onNameSubmit={handleNameSubmit} />}
       <StoryList isAdmin={isAdmin} refinement={refinement} onStorySelect={storySelect} />
       <div className="flex-1 flex flex-col p-4">
         {isAdmin && (
@@ -135,7 +113,7 @@ const Home = ({ params }) => {
         </div>
         <div className="flex-4">
           {!!refinement?.stories[refinement?.currentIndex] && (
-            <UserCards users={users} stories={refinement?.stories} currentIndex={refinement?.currentIndex} />
+            <UserCards users={refinement.users} stories={refinement?.stories} currentIndex={refinement?.currentIndex} />
           )}
         </div>
         <div className="flex-1">
