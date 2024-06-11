@@ -14,6 +14,7 @@ const Home = ({ params }) => {
   const { username, isAdmin } = useAuthContext();
 
   const [refinement, setRefinement] = useState(null);
+  const [userChangedIndex, setUserChangedIndex] = useState(null);
 
   useEffect(() => {
     socket.emit('getRefinement', { id });
@@ -26,6 +27,7 @@ const Home = ({ params }) => {
 
     socket.on('updateRefinement', (refinement) => {
       setRefinement(refinement);
+      setUserChangedIndex(null);
     });
 
     return () => {
@@ -44,7 +46,11 @@ const Home = ({ params }) => {
 
   const revote = () => socket.emit('revote', { refinementId: id });
   const prevStory = () => socket.emit('prevStory', { refinementId: id });
-  const storySelect = (index) => socket.emit('storySelect', { refinementId: id, index });
+  const storySelect = (index) => {
+    if (isAdmin) socket.emit('storySelect', { refinementId: id, index });
+    else if (index !== refinement.currentIndex) setUserChangedIndex(index);
+    else setUserChangedIndex(null);
+  };
   const nextStory = () => socket.emit('nextStory', { refinementId: id });
   const revealVotes = () => socket.emit('revealVotes', { refinementId: id });
   const deleteStory = () => socket.emit('deleteStory', { refinementId: id, index: refinement?.currentIndex });
@@ -55,9 +61,11 @@ const Home = ({ params }) => {
     addStory(document.getElementById('story-name').value, document.getElementById('story-link').value);
   };
 
+  const currentIndex = userChangedIndex ?? refinement?.currentIndex;
+
   return (
     <div className="flex flex-1">
-      <StoryList isAdmin={isAdmin} refinement={refinement} onStorySelect={storySelect} />
+      <StoryList refinement={refinement} onStorySelect={storySelect} currentIndex={currentIndex} />
       <div className="flex-1 flex flex-col p-4">
         {isAdmin && (
           <div className="flex-1 mb-4">
@@ -101,10 +109,10 @@ const Home = ({ params }) => {
         )}
         <div className="flex-1">
           <h1 className="text-l font-mono mb-4 rounded bg-opposite text-white p-2 text-center m-6 mx-20">
-            Current Story: {refinement?.stories[refinement?.currentIndex]?.name || 'No story selected'}
-            {!!refinement?.stories[refinement?.currentIndex]?.link && (
+            Current Story: {refinement?.stories[currentIndex]?.name || 'No story selected'}
+            {!!refinement?.stories[currentIndex]?.link && (
               <span className="rounded-full bg-prominent p-1 mx-2 text-black text-xs">
-                <Link href={refinement?.stories[refinement?.currentIndex]?.link} target="_blank">
+                <Link href={refinement?.stories[currentIndex]?.link} target="_blank">
                   jira
                 </Link>
               </span>
@@ -112,20 +120,17 @@ const Home = ({ params }) => {
           </h1>
         </div>
         <div className="flex-4">
-          {!!refinement?.stories[refinement?.currentIndex] && (
-            <UserCards users={refinement.users} stories={refinement?.stories} currentIndex={refinement?.currentIndex} />
+          {!!refinement?.stories[currentIndex] && (
+            <UserCards users={refinement.users} stories={refinement?.stories} currentIndex={currentIndex} />
           )}
         </div>
         <div className="flex-1">
           {!!refinement?.stories.length &&
             !isAdmin &&
-            !refinement?.stories[refinement?.currentIndex]?.revealed &&
-            !refinement?.stories[refinement?.currentIndex]?.result && (
-              <VotingCards
-                onVote={handleVote}
-                story={refinement?.stories[refinement?.currentIndex]}
-                username={username}
-              />
+            userChangedIndex === null &&
+            !refinement?.stories[currentIndex]?.revealed &&
+            !refinement?.stories[currentIndex]?.result && (
+              <VotingCards onVote={handleVote} story={refinement?.stories[currentIndex]} username={username} />
             )}
         </div>
       </div>
