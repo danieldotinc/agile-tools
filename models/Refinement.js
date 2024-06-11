@@ -26,7 +26,7 @@ const refinementSchema = new mongoose.Schema(
           votes: { type: Object, default: {} },
           name: { type: String, required: true },
           revealed: { type: Boolean, default: false },
-          result: { type: Number, default: null },
+          result: { type: mongoose.Schema.Types.Mixed, default: null },
         },
       ],
       default: [],

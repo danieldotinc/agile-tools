@@ -108,7 +108,12 @@ app.prepare().then(async () => {
         return acc;
       }, {});
 
-      const mostVotedValue = Object.keys(voteCounts).reduce((a, b) => (voteCounts[a] > voteCounts[b] ? a : b));
+      let mostVotedValue = Object.keys(voteCounts).reduce((a, b) => (voteCounts[a] > voteCounts[b] ? a : b));
+      if (mostVotedValue === 'Pass' && Object.keys(voteCounts).length > 1) {
+        delete voteCounts['Pass'];
+        mostVotedValue = Object.keys(voteCounts).reduce((a, b) => (voteCounts[a] > voteCounts[b] ? a : b));
+      }
+
       refinement.stories[refinement.currentIndex].result = mostVotedValue;
 
       io.emit('updateRefinement', refinement);
