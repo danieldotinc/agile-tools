@@ -1,21 +1,41 @@
 // server.js
 const { createServer } = require('http');
 const { parse } = require('url');
+const env = require('dotenv');
 const next = require('next');
 const socketIo = require('socket.io');
-
+const mongoose = require('mongoose');
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
+const Refinement = require('./models/Refinement');
 
-let users = [];
+env.config();
+
+const db = process.env.DATABASE_URI || 'url-not-found';
+mongoose.connect(db).then(() => {
+  console.log(`Connected to database...`);
+});
+
 let refinements = [];
 
-app.prepare().then(() => {
+const fetchRefinements = async () => {
+  const result = await Refinement.find({});
+  if (result.length) refinements = result;
+};
+
+const updateRefinement = async (refinement) => {
+  console.log('updating refinement...');
+  await Refinement.updateOne({ id: refinement.id }, { $set: { ...refinement } }, { upsert: true });
+};
+
+app.prepare().then(async () => {
   const server = createServer((req, res) => {
     const parsedUrl = parse(req.url, true);
     handle(req, res, parsedUrl);
   });
+
+  await fetchRefinements();
 
   const io = socketIo(server);
 
@@ -23,10 +43,15 @@ app.prepare().then(() => {
     console.log('a user connected', socket.id);
 
     // Handle user joining
-    socket.on('join', (username) => {
-      if (!users.some((user) => user.username === username)) {
-        users.push({ id: socket.id, username });
-        io.emit('updateUsers', users);
+    socket.on('join', ({ username, refinementId }) => {
+      const refinementIndex = refinements.findIndex((ref) => ref.id === refinementId);
+      const refinement = refinements[refinementIndex];
+      if (!refinement) return;
+
+      if (!refinement.users.some((user) => user.username === username)) {
+        refinement.users.push({ id: socket.id, username });
+        io.emit('updateRefinement', refinement);
+        updateRefinement({ id: refinement.id, users: refinement.users });
       }
     });
 
@@ -36,12 +61,14 @@ app.prepare().then(() => {
 
     socket.on('getRefinement', ({ id }) => {
       const refinement = refinements.find((ref) => ref.id === id);
-      if (refinement) io.emit('initRefinement', { refinement, users });
+      if (refinement) io.emit('initRefinement', { refinement });
     });
 
     socket.on('addRefinement', ({ name, id }) => {
-      refinements.unshift({ name, id, stories: [], currentIndex: 0 });
+      const refinement = { name, id, stories: [], currentIndex: 0, users: [] };
+      refinements.unshift(refinement);
       io.emit('updateRefinements', refinements);
+      updateRefinement(refinement);
     });
 
     socket.on('addStory', (story) => {
@@ -56,6 +83,7 @@ app.prepare().then(() => {
           result: null,
         });
         io.emit('updateRefinement', refinement);
+        updateRefinement({ id: refinement.id, stories: refinement.stories });
       }
     });
 
@@ -80,10 +108,16 @@ app.prepare().then(() => {
         return acc;
       }, {});
 
-      const mostVotedValue = Object.keys(voteCounts).reduce((a, b) => (voteCounts[a] > voteCounts[b] ? a : b));
+      let mostVotedValue = Object.keys(voteCounts).reduce((a, b) => (voteCounts[a] > voteCounts[b] ? a : b));
+      if (mostVotedValue === 'Pass' && Object.keys(voteCounts).length > 1) {
+        delete voteCounts['Pass'];
+        mostVotedValue = Object.keys(voteCounts).reduce((a, b) => (voteCounts[a] > voteCounts[b] ? a : b));
+      }
+
       refinement.stories[refinement.currentIndex].result = mostVotedValue;
 
       io.emit('updateRefinement', refinement);
+      updateRefinement({ id: refinement.id, stories: refinement.stories });
     });
 
     socket.on('revote', ({ refinementId }) => {
@@ -96,6 +130,7 @@ app.prepare().then(() => {
       refinement.stories[refinement.currentIndex].revealed = false;
 
       io.emit('updateRefinement', refinement);
+      updateRefinement({ id: refinement.id, stories: refinement.stories });
     });
 
     socket.on('deleteStory', ({ refinementId, index }) => {
@@ -107,6 +142,7 @@ app.prepare().then(() => {
       refinement.currentIndex = index === 0 ? 0 : refinement.currentIndex - 1;
 
       io.emit('updateRefinement', refinement);
+      updateRefinement({ id: refinement.id, stories: refinement.stories });
     });
 
     socket.on('storySelect', ({ refinementId, index }) => {
@@ -142,9 +178,11 @@ app.prepare().then(() => {
     });
 
     socket.on('disconnect', () => {
-      users = users.filter((user) => user.id !== socket.id);
-      io.emit('updateUsers', users);
-      console.log('user disconnected', socket.id);
+      for (let refinement of refinements) {
+        refinement.users = refinement.users.filter((user) => user.id !== socket.id);
+        io.emit('updateRefinements', refinements);
+        console.log('user disconnected', socket.id);
+      }
     });
   });
 
