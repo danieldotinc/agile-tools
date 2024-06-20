@@ -11,20 +11,27 @@ const UserCards = ({ users, stories, currentIndex }) => {
 
   return (
     <div className="flex justify-center space-x-4 mb-4 flex-wrap">
-      {users
-        .filter((u) => u.username !== 'admin')
-        .map((user) => (
-          <div key={user.id} className={`p-2 text-dark`}>
-            <div className="text-center font-normal">{user.username}</div>
-            <Image
-              src={`/assets/${getCard(stories[currentIndex].votes[user.username])}.png`}
-              className="w-24 h-32"
-              width={175}
-              height={300}
-              alt="vote"
-            />
-          </div>
-        ))}
+      {revealed
+        ? Object.entries(stories[currentIndex].votes).map(([username, vote]) => (
+            <div key={username} className={`p-2 text-dark`}>
+              <div className="text-center font-normal">{username}</div>
+              <Image src={`/assets/${getCard(vote)}.png`} className="w-24 h-32" width={175} height={300} alt="vote" />
+            </div>
+          ))
+        : users
+            .filter((u) => u.username !== 'admin')
+            .map((user) => (
+              <div key={user.id} className={`p-2 text-dark`}>
+                <div className="text-center font-normal">{user.username}</div>
+                <Image
+                  src={`/assets/${getCard(stories[currentIndex].votes[user.username])}.png`}
+                  className="w-24 h-32"
+                  width={175}
+                  height={300}
+                  alt="vote"
+                />
+              </div>
+            ))}
     </div>
   );
 };

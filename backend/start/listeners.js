@@ -1,4 +1,4 @@
-const { updateRefinement } = require('../repository');
+const { updateRefinement, updateUsers } = require('../repository');
 
 module.exports = ({ io, server, data: refinements }) => {
   io.on('connection', (socket) => {
@@ -142,9 +142,10 @@ module.exports = ({ io, server, data: refinements }) => {
     socket.on('disconnect', () => {
       for (let refinement of refinements) {
         refinement.users = refinement.users.filter((user) => user.id !== socket.id);
-        io.emit('updateRefinements', refinements);
-        console.log('user disconnected', socket.id);
       }
+      console.log('user disconnected', socket.id);
+      io.emit('updateRefinements', refinements);
+      updateUsers(refinements);
     });
   });
 
