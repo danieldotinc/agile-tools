@@ -10,7 +10,7 @@ const UserCards = ({ users, stories, currentIndex }) => {
   };
 
   return (
-    <div className="flex justify-center space-x-4 mb-4">
+    <div className="flex justify-center space-x-4 mb-4 flex-wrap">
       {users
         .filter((u) => u.username !== 'admin')
         .map((user) => (
