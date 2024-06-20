@@ -1,4 +1,4 @@
-const { updateRefinement, updateUsers } = require('../repository');
+const { updateRefinement, updateUsers, deleteRefinement } = require('../repository');
 
 module.exports = ({ io, server, data: refinements }) => {
   io.on('connection', (socket) => {
@@ -31,6 +31,13 @@ module.exports = ({ io, server, data: refinements }) => {
       refinements.unshift(refinement);
       io.emit('updateRefinements', refinements);
       updateRefinement(refinement);
+    });
+
+    socket.on('deleteRefinement', (id) => {
+      const refinementIndex = refinements.findIndex((ref) => ref.id === id);
+      refinements.splice(refinementIndex, 1);
+      io.emit('updateRefinements', refinements);
+      deleteRefinement(id);
     });
 
     socket.on('addStory', (story) => {

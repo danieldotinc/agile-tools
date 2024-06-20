@@ -5,11 +5,13 @@ import { nanoid } from 'nanoid';
 
 import socket from '../socket';
 import { useAuthContext } from '../context/AuthContext';
+import DeletePrompt from '../components/DeletePrompt';
 
 const Page = () => {
   const router = useRouter();
   const { isAdmin } = useAuthContext();
   const [refinements, setRefinements] = useState<{ name: string; id: string }[]>([]);
+  const [deleteId, setDeleteId] = useState('');
 
   useEffect(() => {
     socket.emit('getRefinements');
@@ -36,6 +38,11 @@ const Page = () => {
     }
   };
 
+  const handleDelete = () => {
+    socket.emit('deleteRefinement', deleteId);
+    setDeleteId('');
+  };
+
   const handleRefinementSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     addRefinement((document.getElementById('refinement-name') as HTMLInputElement).value);
@@ -53,7 +60,7 @@ const Page = () => {
                 className="flex-1 border p-2 mr-2 rounded"
                 id="refinement-name"
               />
-              <button type="submit" className=" bg-slate-600 text-white p-2 rounded">
+              <button type="submit" className=" bg-yellow-500 text-black px-4 rounded">
                 Create
               </button>
             </form>
@@ -63,14 +70,35 @@ const Page = () => {
               refinements.map((refinement, index) => (
                 <div
                   key={refinement.id}
-                  className={`shadow-lg hover:shadow-3xl cursor-pointer rounded-lg border p-4 hover:bg-zinc-800 ${
+                  className={`shadow-lg hover:shadow-3xl rounded-lg border p-4 hover:bg-zinc-800 ${
                     index > 1 && 'hidden md:block'
                   }`}
-                  onClick={() => !!refinement.id && router.push(`/refinement/${refinement.id}`)}
                 >
-                  <div className="text-sm font-semibold">{refinement.name}</div>
-                  <div className="text-sm text-zinc-600">Join the game and start playing!</div>
-                  <div className={`text-sm text-yellow-500`}>Refinement-ID: {refinement.id}</div>
+                  <div
+                    className="text-sm font-semibold cursor-pointer"
+                    onClick={() => !!refinement.id && router.push(`/refinement/${refinement.id}`)}
+                  >
+                    {refinement.name}
+                  </div>
+                  <div className="flex flex-col">
+                    <span
+                      className="py-1 text-sm text-yellow-500 cursor-pointer"
+                      onClick={() => !!refinement.id && router.push(`/refinement/${refinement.id}`)}
+                    >
+                      Refinement-ID: {refinement.id}
+                    </span>
+                    {isAdmin && (
+                      <>
+                        <span
+                          className="text-right text-xs text-red-500 cursor-pointer"
+                          onClick={() => setDeleteId(refinement.id)}
+                        >
+                          delete
+                        </span>
+                        {!!deleteId && <DeletePrompt onCancel={() => setDeleteId('')} onDelete={handleDelete} />}
+                      </>
+                    )}
+                  </div>
                 </div>
               ))
             ) : (

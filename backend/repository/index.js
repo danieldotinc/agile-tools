@@ -11,6 +11,11 @@ const updateRefinement = async (refinement) => {
   await Refinement.updateOne({ id: refinement.id }, { $set: { ...refinement } }, { upsert: true });
 };
 
+const deleteRefinement = async (id) => {
+  console.log('deleting refinement...');
+  await Refinement.deleteOne({ id });
+};
+
 const updateUsers = async (refinements) => {
   console.log('updating users...');
   for (const refinement of refinements) {
@@ -18,4 +23,4 @@ const updateUsers = async (refinements) => {
   }
 };
 
-module.exports = { fetchRefinements, updateRefinement, updateUsers };
+module.exports = { fetchRefinements, updateRefinement, deleteRefinement, updateUsers };
