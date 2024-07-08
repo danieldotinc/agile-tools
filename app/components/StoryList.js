@@ -1,7 +1,7 @@
 const StoryList = ({ refinement, onStorySelect, currentIndex }) => {
   return (
     <div className="w-1/4 p-4 border-r" style={{ flexBasis: '25%' }}>
-      <h2 className="text-lg font-bold mb-4">Stories</h2>
+      <h2 className="text-lg font-bold mb-4">Stories : <span className="text-prominent">{refinement.name}</span></h2>
       <ul>
         {refinement?.stories.map((story, index) => (
           <li

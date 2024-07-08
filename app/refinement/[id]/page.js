@@ -109,7 +109,7 @@ const Home = ({ params }) => {
         )}
         <div className="flex-1">
           <h1 className="text-l font-mono mb-4 rounded bg-opposite text-white p-2 text-center m-6 mx-20">
-            Current Story: {refinement?.stories[currentIndex]?.name || 'No story selected'}
+            Story: {refinement?.stories[currentIndex]?.name || 'No story selected'}
             {!!refinement?.stories[currentIndex]?.link && (
               <span className="rounded-full bg-prominent p-1 mx-2 text-black text-xs">
                 <Link href={refinement?.stories[currentIndex]?.link} target="_blank">
