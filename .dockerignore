@@ -3,4 +3,4 @@ node_modules
 Dockerfile
 .dockerignore
 tests
-README.md
+.next
