@@ -124,6 +124,16 @@ module.exports = ({ io, server, data: refinements }) => {
       io.emit('updateRefinement', refinement);
     });
 
+    socket.on('reorderStories', ({ refinementId, stories }) => {
+      const refinementIndex = refinements.findIndex((ref) => ref.id === refinementId);
+      const refinement = refinements[refinementIndex];
+      if (!refinement) return;
+
+      refinement.stories = stories;
+
+      io.emit('updateRefinement', refinement);
+    });
+
     socket.on('nextStory', ({ refinementId }) => {
       const refinementIndex = refinements.findIndex((ref) => ref.id === refinementId);
       const refinement = refinements[refinementIndex];

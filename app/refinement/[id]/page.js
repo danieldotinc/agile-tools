@@ -1,5 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+
 import socket from '@/app/socket';
 import Link from 'next/link';
 
@@ -56,6 +59,13 @@ const Home = ({ params }) => {
   const deleteStory = () => socket.emit('deleteStory', { refinementId: id, index: refinement?.currentIndex });
   const handleVote = (card) => (!isAdmin ? socket.emit('vote', { refinementId: id, username, card }) : null);
 
+  const handleReorder = (orderedStories, toIndex) => {
+    if (isAdmin) {
+      socket.emit('reorderStories', { refinementId: id, stories: orderedStories });
+      storySelect(toIndex);
+    }
+  };
+
   const handleStorySubmit = (e) => {
     e.preventDefault();
     addStory(document.getElementById('story-name').value, document.getElementById('story-link').value);
@@ -65,7 +75,14 @@ const Home = ({ params }) => {
 
   return (
     <div className="flex flex-1">
-      <StoryList refinement={refinement} onStorySelect={storySelect} currentIndex={currentIndex} />
+      <DndProvider backend={HTML5Backend}>
+        <StoryList
+          refinement={refinement}
+          onStorySelect={storySelect}
+          onReorder={handleReorder}
+          currentIndex={currentIndex}
+        />
+      </DndProvider>
       <div className="flex-1 flex flex-col p-4">
         {isAdmin && (
           <div className="flex-1 mb-4">
