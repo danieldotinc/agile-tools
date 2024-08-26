@@ -113,7 +113,7 @@ const PreRefinement = () => {
     <div className="flex flex-1">
       <div className="w-1/4 p-4 border-r">
         {isAdmin && (
-          <div className="flex-1 mb-6">
+          <div className="flex-1 mb-10">
             <div className="mt-4 ">
               <form onSubmit={handleStorySubmit}>
                 <input
@@ -152,7 +152,23 @@ const PreRefinement = () => {
           </DndProvider>
         </div>
       </div>
-      <div className="w-1/4 p-4 border-r" style={{ flexBasis: '25%' }}></div>
+      <div className="flex w-1/4 p-4 border-r flex-col">
+        <li className={`flex-2 mb-2 p-2 rounded flex border-red-600 border-2`}>
+          <span className="text-lg text-gray-400 font-mono">Joker</span>
+        </li>
+        <li className={`flex-2 mb-2 p-2 rounded flex border-blue-600 border-2`}>
+          <span className="text-lg text-gray-400 font-mono">Mercury</span>
+        </li>
+        <li className={`flex-2 mb-2 p-2 rounded flex border-yellow-600 border-2`}>
+          <span className="text-lg text-gray-400 font-mono">Scooby-Doo</span>
+        </li>
+        <li className={`flex-2 mb-2 p-2 rounded flex border-green-600 border-2`}>
+          <span className="text-lg text-gray-400 font-mono">Futurama</span>
+        </li>
+        <li className={`flex-2 mb-2 p-2 rounded flex border-white border-2`}>
+          <span className="text-lg text-gray-400 font-mono">Octopus</span>
+        </li>
+      </div>
       <div className="w-1/4 p-4 border-r" style={{ flexBasis: '25%' }}></div>
     </div>
   );
