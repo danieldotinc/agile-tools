@@ -8,20 +8,21 @@ export default function Home() {
     {
       heading: 'Refinement',
       subheading: `Do you have some tickets to estimate?`,
-      message: `1.create a polling game 2.add user stories 3.share the link`,
+      message: '1. create a polling game 🃏\n2. add user stories 💡\n3. share the link 🔗',
       link: '/refinement',
       ready: true,
     },
     {
-      heading: 'Sprint Capacity',
-      subheading: 'Do you want an estimate for capacity for next sprint?',
-      message: 'under construction!',
-      ready: false,
+      heading: 'Pre-Refinement',
+      subheading: 'Decide on a team and a pre-refinement ninja!',
+      message: "1. add user stories 💡\n2. drop it in a team's bucket 🪣\n3. assign a ninja 🥷🏻",
+      link: '/pre-refinement',
+      ready: true,
     },
     {
-      heading: 'Coffee Call Games',
-      subheading: 'Do you want to play some games with the team?',
-      message: `under construction!`,
+      heading: 'Sprint Capacity',
+      subheading: 'Estimate capacity for next sprint?',
+      message: 'under construction!',
       ready: false,
     },
     {
@@ -45,16 +46,10 @@ export default function Home() {
                 }`}
                 onClick={() => !!example.link && router.push(example.link)}
               >
-                <div className="text-sm font-semibold">{example.heading}</div>
-                <div className="text-sm text-zinc-600">
-                  {example.subheading}
-                </div>
-                <div
-                  className={`text-sm ${
-                    example.ready ? 'text-yellow-500' : 'text-red-700'
-                  }`}
-                >
-                  {example.message}
+                <div className="text-lg">{example.heading}</div>
+                <div className="text-lg text-zinc-500">{example.subheading}</div>
+                <div className={`text-lg ${example.ready ? 'text-yellow-500' : 'text-red-700'}`}>
+                  <pre>{example.message}</pre>
                 </div>
               </div>
             ))}
