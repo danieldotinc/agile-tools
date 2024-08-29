@@ -1,48 +1,65 @@
 'use client';
 import { Droppable, Draggable, DraggingStyle, NotDraggingStyle } from 'react-beautiful-dnd';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faCircleArrowRight,
+  faCommentMedical,
+  faComments,
+  faMagnifyingGlass,
+  faUserNinja,
+} from '@fortawesome/free-solid-svg-icons';
+
 import Link from 'next/link';
-
-export type PreStory = {
-  id: string;
-  name: string;
-  link?: string;
-};
-
-export type Buckets = Record<string, PreStory[]>;
+import { useState } from 'react';
+import StoryDetails from './StoryDetails';
+import { Teams, PreStory, usePreRefinement } from '../store/pre-refinement';
 
 type Props = {
-  buckets: Buckets;
+  teams: Teams;
 };
 
-const StoryBuckets = ({ buckets }: Props) => {
+const StoryBuckets = ({ teams }: Props) => {
+  const [isStoryDetailVisible, setStoryDetailVisibility] = useState(false);
+  const [selectedStory, setSelectedStory] = usePreRefinement((state) => [state.selectedStory, state.setDetailedStory]);
   const grid = 8;
 
   const getItemStyle = (isDragging: boolean, draggableStyle: DraggingStyle | NotDraggingStyle | undefined) => ({
     padding: 10,
     margin: `0 0 ${grid}px 0`,
-    'border-radius': `8px`,
+    borderRadius: `8px`,
     background: 'rgb(51 65 85)',
     display: 'flex',
-    'justify-content': 'space-between',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
     ...draggableStyle,
   });
 
   const getListStyle = (isDraggingOver: boolean) => ({
     // background: isDraggingOver ? 'darkgray' : 'dark',
     padding: grid,
-    'margin-bottom': '30px',
-    'border-left': `1px solid #fcba03`,
-    'border-radius': '8px',
+    marginBottom: '30px',
+    borderLeft: `1px solid #fcba03`,
+    borderRadius: '8px',
   });
+
+  const handleStoryDetailsView = (story: PreStory, index: number) => {
+    if (!isStoryDetailVisible) setSelectedStory({ ...story, index });
+    else setSelectedStory(undefined);
+
+    setStoryDetailVisibility(!isStoryDetailVisible);
+  };
 
   return (
     <>
-      {Object.keys(buckets).map((bucket) => (
+      {isStoryDetailVisible && !!selectedStory && (
+        <StoryDetails onClose={() => handleStoryDetailsView(selectedStory, 0)} />
+      )}
+      {Object.keys(teams).map((bucket) => (
         <Droppable droppableId={bucket} key={bucket}>
           {(provided, snapshot) => (
             <div ref={provided.innerRef} {...provided.droppableProps} style={getListStyle(snapshot.isDraggingOver)}>
               <span className="text-lg font-mono text-prominent">{bucket.split('-')[0]}</span>
-              {buckets[bucket].map((story: PreStory, index: number) => (
+              {teams[bucket].map((story: PreStory, index: number) => (
                 <Draggable key={story.id} draggableId={story.id} index={index}>
                   {(provided, snapshot) => (
                     <div
@@ -51,18 +68,75 @@ const StoryBuckets = ({ buckets }: Props) => {
                       {...provided.dragHandleProps}
                       style={getItemStyle(snapshot.isDragging, provided.draggableProps.style)}
                     >
-                      {story.name}
-                      {story.link ? (
-                        <span>
-                          <Link
-                            className="rounded-full bg-blue-500 px-3 py-1 mx-1 text-white text-sm shadow-xl"
-                            href={story.link}
-                            target="_blank"
-                          >
-                            jira
-                          </Link>
+                      <span className="flex flex-row justify-between">
+                        {story.name}
+                        {story.link ? (
+                          <span className="flex flex-col">
+                            <Link
+                              className="rounded-full bg-blue-500 px-3 py-1 mx-1 text-white text-sm shadow-xl"
+                              href={story.link}
+                              target="_blank"
+                              title="Open Jira Link"
+                            >
+                              jira
+                            </Link>
+                          </span>
+                        ) : null}
+                      </span>
+
+                      <span className="flex w-full mt-2 justify-between">
+                        <FontAwesomeIcon
+                          icon={faMagnifyingGlass}
+                          className="fa-fw cursor-pointer"
+                          size="lg"
+                          onClick={() => handleStoryDetailsView(story, index)}
+                          title="Open Detail View"
+                        />
+                        <span className="flex items-center">
+                          {!!story.comments ? (
+                            <FontAwesomeIcon
+                              size="lg"
+                              icon={faComments}
+                              className="fa-fw cursor-pointer mr-2"
+                              title="See Comments"
+                              onClick={() => handleStoryDetailsView(story, index)}
+                            />
+                          ) : (
+                            <FontAwesomeIcon
+                              size="lg"
+                              icon={faCommentMedical}
+                              className="fa-fw cursor-pointer mr-2"
+                              title="Add a comment"
+                              onClick={() => handleStoryDetailsView(story, index)}
+                            />
+                          )}
+                          {!!story.assigned ? (
+                            <span
+                              className={`rounded-full bg-prominent p-1 text-black font-mono text-xs shadow-xl mr-1 cursor-pointer`}
+                              onClick={() => handleStoryDetailsView(story, index)}
+                            >
+                              {story.assigned}
+                            </span>
+                          ) : (
+                            <FontAwesomeIcon
+                              size="lg"
+                              icon={faUserNinja}
+                              className="fa-fw cursor-pointer mr-2"
+                              title="Assign a Ninja"
+                              onClick={() => handleStoryDetailsView(story, index)}
+                            />
+                          )}
+                          {!!story.team ? (
+                            <span
+                              className={`rounded-full bg-white p-1 text-black font-mono text-xs shadow-xl mr-1 cursor-pointer`}
+                              onClick={() => handleStoryDetailsView(story, index)}
+                              title="This is the assigned team"
+                            >
+                              {story.team.split('-')[0]}
+                            </span>
+                          ) : null}
                         </span>
-                      ) : null}
+                      </span>
                     </div>
                   )}
                 </Draggable>
