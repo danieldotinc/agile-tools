@@ -85,7 +85,7 @@ module.exports = ({ io, server }) => {
         },
       };
 
-      if (!preRef?.teams) return;
+      if (!preRef?.teams || !preRef.teams['Stories']) return;
 
       preRef.teams['Stories'].unshift({
         id: preStory.id,

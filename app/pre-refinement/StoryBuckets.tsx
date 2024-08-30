@@ -101,7 +101,7 @@ const StoryBuckets = ({ teams }: Props) => {
                           title="Open detail view"
                         />
                         <span className="flex items-center">
-                          {!!story.comments ? (
+                          {!!story.comments?.length ? (
                             <FontAwesomeIcon
                               size="lg"
                               icon={faComments}
