@@ -5,7 +5,9 @@ import {
   faCircleArrowRight,
   faCommentMedical,
   faComments,
+  faForward,
   faMagnifyingGlass,
+  faPaperPlane,
   faUserNinja,
 } from '@fortawesome/free-solid-svg-icons';
 
@@ -55,6 +57,18 @@ const StoryBuckets = ({ teams }: Props) => {
     else setSelectedStory(undefined);
 
     setStoryDetailVisibility(!isStoryDetailVisible);
+  };
+
+  const handleSending = (story: PreStory, index: number) => {
+    return;
+  };
+
+  const handleMovingToDone = (story: PreStory, index: number) => {
+    return;
+  };
+
+  const handleMovingToProgress = (story: PreStory, index: number) => {
+    return;
   };
 
   return (
@@ -139,12 +153,39 @@ const StoryBuckets = ({ teams }: Props) => {
                             <span
                               className={`rounded-full ${
                                 TEAM_COLOR[story.team.split('-')[0]]
-                              } p-1 text-black font-mono text-xs shadow-xl mr-1 cursor-pointer`}
+                              } p-1 text-black font-mono text-xs shadow-xl mr-2 cursor-pointer`}
                               onClick={() => handleStoryDetailsView(story, index)}
                               title="This is the assigned team"
                             >
                               {story.team.split('-')[0]}
                             </span>
+                          ) : null}
+                          {!!story.team && story.team.includes('-D') ? (
+                            <FontAwesomeIcon
+                              size="lg"
+                              icon={faPaperPlane}
+                              className="fa-fw cursor-pointer mr-2"
+                              title={`Send to ${story.team.split('-')[0]} refinement`}
+                              onClick={() => handleSending(story, index)}
+                            />
+                          ) : null}
+                          {!!story.team && story.team.includes('-P') ? (
+                            <FontAwesomeIcon
+                              size="lg"
+                              icon={faForward}
+                              className="fa-fw cursor-pointer mr-2"
+                              title={`Move to ready-for-refinement column`}
+                              onClick={() => handleMovingToDone(story, index)}
+                            />
+                          ) : null}
+                          {!!story.team && !story.team.includes('Stories') && !story.team.includes('-') ? (
+                            <FontAwesomeIcon
+                              size="lg"
+                              icon={faForward}
+                              className="fa-fw cursor-pointer mr-2"
+                              title={`Move to in-progress column`}
+                              onClick={() => handleMovingToProgress(story, index)}
+                            />
                           ) : null}
                         </span>
                       </span>
