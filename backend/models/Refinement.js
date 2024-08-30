@@ -22,7 +22,11 @@ const refinementSchema = new mongoose.Schema(
     stories: {
       type: [
         {
+          id: { type: String },
           link: { type: String },
+          team: { type: String },
+          assigned: { type: String },
+          comments: { type: [String], default: [] },
           votes: { type: Object, default: {} },
           name: { type: String, required: true },
           revealed: { type: Boolean, default: false },

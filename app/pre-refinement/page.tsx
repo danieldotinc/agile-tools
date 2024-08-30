@@ -141,7 +141,7 @@ const PreRefinement = () => {
                     <button type="submit" className=" bg-slate-600 text-white p-2 mr-2 rounded">
                       Create
                     </button>
-                    <button className="bg-red-500 text-white p-2 rounded">Delete</button>
+                    {/* <button className="bg-red-500 text-white p-2 rounded">Delete</button> */}
                   </div>
                 </form>
               </div>

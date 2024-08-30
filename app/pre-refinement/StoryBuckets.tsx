@@ -1,8 +1,11 @@
 'use client';
+import { useState } from 'react';
+import { nanoid } from 'nanoid';
+import Link from 'next/link';
 import { Droppable, Draggable, DraggingStyle, NotDraggingStyle } from 'react-beautiful-dnd';
+import socket from '@/app/socket';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faCircleArrowRight,
   faCommentMedical,
   faComments,
   faForward,
@@ -11,8 +14,6 @@ import {
   faUserNinja,
 } from '@fortawesome/free-solid-svg-icons';
 
-import Link from 'next/link';
-import { useState } from 'react';
 import StoryDetails from './StoryDetails';
 import { Teams, PreStory, usePreRefinement } from '../store/pre-refinement';
 
@@ -59,9 +60,8 @@ const StoryBuckets = ({ teams }: Props) => {
     setStoryDetailVisibility(!isStoryDetailVisible);
   };
 
-  const handleSending = (story: PreStory, index: number) => {
-    return;
-  };
+  const handleSendingToRefinement = (preStory: PreStory) =>
+    socket.emit('sendStoryToRefinement', { ...preStory, refinementId: nanoid(6) });
 
   const handleMovingToDone = (story: PreStory, index: number) => {
     return;
@@ -166,7 +166,7 @@ const StoryBuckets = ({ teams }: Props) => {
                               icon={faPaperPlane}
                               className="fa-fw cursor-pointer mr-2"
                               title={`Send to ${story.team.split('-')[0]} refinement`}
-                              onClick={() => handleSending(story, index)}
+                              onClick={() => handleSendingToRefinement(story)}
                             />
                           ) : null}
                           {!!story.team && story.team.includes('-P') ? (

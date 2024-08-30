@@ -1,7 +1,7 @@
 const PreRefinement = require('../models/PreRefinement');
 
 const fetchPreRefinement = async () => {
-  const result = await PreRefinement.findOne({});
+  const result = await PreRefinement.findOne({}).select('-__v').lean().exec();
   if (result) return result;
 };
 

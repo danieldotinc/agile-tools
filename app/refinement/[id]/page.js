@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { nanoid } from 'nanoid';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
@@ -41,7 +42,7 @@ const Home = ({ params }) => {
 
   const addStory = (name, link) => {
     if (String(name).trim()) {
-      socket.emit('addStory', { refinementId: id, name: String(name).trim(), link });
+      socket.emit('addStory', { id: nanoid(6), name: String(name).trim(), link, refinementId: id });
       document.getElementById('story-name').value = '';
       document.getElementById('story-link').value = '';
     }

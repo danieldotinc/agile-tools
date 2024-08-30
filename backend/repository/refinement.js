@@ -1,7 +1,7 @@
 const Refinement = require('../models/Refinement');
 
 const fetchRefinements = async () => {
-  const result = await Refinement.find({});
+  const result = await Refinement.find({}).select('-__v').lean().exec();
   if (result.length) return result;
   return [];
 };

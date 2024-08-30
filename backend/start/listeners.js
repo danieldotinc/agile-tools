@@ -1,6 +1,19 @@
 const { updateRefinement, updateUsers, deleteRefinement, fetchRefinements } = require('../repository/refinement');
 const { updatePreRefinement, fetchPreRefinement } = require('../repository/pre-refinement');
 
+const generateRefinement = (id, name) => ({ id, name, stories: [], currentIndex: 0, users: [] });
+const generateStory = ({ id, name, link, team, assigned, comments }) => ({
+  id,
+  name,
+  link,
+  votes: {},
+  revealed: false,
+  result: null,
+  comments,
+  assigned,
+  team,
+});
+
 module.exports = async ({ io, server }) => {
   let refinements = await fetchRefinements();
   let preRefinement = await fetchPreRefinement();
@@ -34,7 +47,7 @@ module.exports = async ({ io, server }) => {
     });
 
     socket.on('addRefinement', ({ name, id }) => {
-      const refinement = { name, id, stories: [], currentIndex: 0, users: [] };
+      const refinement = generateRefinement(id, name);
       refinements.unshift(refinement);
       io.emit('updateRefinements', refinements);
       updateRefinement(refinement);
@@ -51,13 +64,7 @@ module.exports = async ({ io, server }) => {
       const refinementIndex = refinements.findIndex((ref) => ref.id === story.refinementId);
       const refinement = refinements[refinementIndex];
       if (refinement) {
-        refinement.stories.push({
-          name: story.name,
-          link: story.link,
-          votes: {},
-          revealed: false,
-          result: null,
-        });
+        refinement.stories.push(generateStory({ name: story.name, link: story.link, id: story.id }));
         io.emit('updateRefinement', refinement);
         updateRefinement({ id: refinement.id, stories: refinement.stories });
       }
@@ -94,6 +101,34 @@ module.exports = async ({ io, server }) => {
         link: preStory.link,
       });
 
+      io.emit('updatePreRefinement', preRef);
+      updatePreRefinement(preRef);
+    });
+
+    socket.on('sendStoryToRefinement', async (preStory) => {
+      const { id, name, link, team, assigned, comments, refinementId } = preStory;
+      if (!team) return;
+
+      const teamName = team.split('-')[0];
+      refinements = await fetchRefinements();
+      const refinementIndex = refinements.findIndex((ref) => ref.name.startsWith(teamName));
+
+      const refinement =
+        refinementIndex === -1
+          ? generateRefinement(refinementId, `${teamName} Refinement`)
+          : refinements[refinementIndex];
+
+      const story = generateStory({ name, link, team: teamName, assigned, comments, id });
+      refinement.stories.push(story);
+
+      refinements.unshift(refinement);
+      updateRefinement(refinement);
+
+      const preRef = await fetchPreRefinement();
+      if (!preRef) return;
+
+      const preStoryIndex = preRef.teams[team].findIndex((st) => st.id === id);
+      preRef.teams[team].splice(preStoryIndex, 1);
       io.emit('updatePreRefinement', preRef);
       updatePreRefinement(preRef);
     });
