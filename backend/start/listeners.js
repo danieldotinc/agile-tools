@@ -1,8 +1,10 @@
-const { updateRefinement, updateUsers, deleteRefinement } = require('../repository/refinement');
+const { updateRefinement, updateUsers, deleteRefinement, fetchRefinements } = require('../repository/refinement');
+const { updatePreRefinement, fetchPreRefinement } = require('../repository/pre-refinement');
 
-module.exports = ({ io, server, data: { refinements, preRefinement } }) => {
-  io.on('connection', (socket) => {
-    console.log('a user connected', socket.id);
+module.exports = ({ io, server }) => {
+  io.on('connection', async (socket) => {
+    const refinements = await fetchRefinements();
+    const preRefinement = await fetchPreRefinement();
 
     // Handle user joining
     socket.on('join', ({ username, refinementId }) => {
@@ -60,6 +62,41 @@ module.exports = ({ io, server, data: { refinements, preRefinement } }) => {
       }
     });
 
+    socket.on('addPreStory', (preStory) => {
+      const preRef = preRefinement ?? {
+        id: preStory.preRefId,
+        teams: {
+          Stories: [],
+          Joker: [],
+          Mercury: [],
+          ScoobyDoo: [],
+          Futurama: [],
+          Octopus: [],
+          'Joker-P': [],
+          'Mercury-P': [],
+          'ScoobyDoo-P': [],
+          'Futurama-P': [],
+          'Octopus-P': [],
+          'Joker-D': [],
+          'Mercury-D': [],
+          'ScoobyDoo-D': [],
+          'Futurama-D': [],
+          'Octopus-D': [],
+        },
+      };
+
+      if (!preRef?.teams) return;
+
+      preRef.teams['Stories'].unshift({
+        id: preStory.id,
+        name: preStory.name,
+        link: preStory.link,
+      });
+
+      io.emit('updatePreRefinement', preRef);
+      updatePreRefinement(preRef);
+    });
+
     socket.on('vote', ({ refinementId, username, card }) => {
       const refinementIndex = refinements.findIndex((ref) => ref.id === refinementId);
       const refinement = refinements[refinementIndex];
@@ -67,6 +104,14 @@ module.exports = ({ io, server, data: { refinements, preRefinement } }) => {
         refinement.stories[refinement.currentIndex].votes[username] = card;
         io.emit('updateRefinement', refinement);
       }
+    });
+
+    socket.on('updateTeams', ({ preRefId, teams }) => {
+      if (preRefId !== preRefinement.id) return;
+
+      const preRef = { id: preRefId, teams };
+      io.emit('updatePreRefinement', preRef);
+      updatePreRefinement(preRef);
     });
 
     socket.on('revealVotes', ({ refinementId }) => {

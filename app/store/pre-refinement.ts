@@ -15,17 +15,20 @@ export type Teams = Record<string, PreStory[]>;
 
 type PreRefinement = {
   teams: Teams;
+  preRefId?: string;
   selectedStory?: PreStory;
   setTeams: (teams: Teams) => void;
+  setPreRefId: (id: string) => void;
   updateStory: (story: PreStory) => void;
   setDetailedStory: (story?: PreStory) => void;
 };
 
 export const usePreRefinement = create<PreRefinement>((set) => ({
+  preRefId: undefined,
   selectedStory: undefined,
   teams: {
-    Stories: [...FAKE_STORIES_1],
-    Joker: [...FAKE_STORIES_2],
+    Stories: [],
+    Joker: [],
     Mercury: [],
     ScoobyDoo: [],
     Futurama: [],
@@ -42,7 +45,8 @@ export const usePreRefinement = create<PreRefinement>((set) => ({
     'Octopus-D': [],
   },
   setTeams: (teams: Teams) => set((state) => ({ teams: { ...teams } })),
-  setDetailedStory: (story: PreStory) => set((state) => ({ selectedStory: story })),
+  setPreRefId: (id: string) => set((state) => ({ preRefId: id })),
+  setDetailedStory: (story?: PreStory) => set((state) => ({ selectedStory: story })),
   updateStory: (story: PreStory) =>
     set((state) => {
       const team = story.team ?? 'Stories';

@@ -5,9 +5,9 @@ const fetchPreRefinement = async () => {
   if (result) return result;
 };
 
-const updatePreRefinement = async (teams) => {
+const updatePreRefinement = async (preRef) => {
   console.log('updating pre-refinement...');
-  await PreRefinement.updateOne({}, { $set: { teams: { ...teams } } }, { upsert: true });
+  await PreRefinement.updateOne({ id: preRef.id }, { $set: { teams: { ...preRef.teams } } }, { upsert: true });
 };
 
 module.exports = { fetchPreRefinement, updatePreRefinement };

@@ -7,7 +7,7 @@ import socket from '@/app/socket';
 import { useAuthContext } from '@/app/context/AuthContext';
 
 import StoryBuckets from './StoryBuckets';
-import { usePreRefinement, PreStory } from '../store/pre-refinement';
+import { usePreRefinement, PreStory, Teams } from '../store/pre-refinement';
 
 type PreRefinement = {
   currentIndex: number;
@@ -18,6 +18,12 @@ const PreRefinement = () => {
   const { isAdmin } = useAuthContext();
 
   const [teams, setTeams] = usePreRefinement((state) => [state.teams, state.setTeams]);
+  const [preRefId, setPreRefId] = usePreRefinement((state) => [state.preRefId, state.setPreRefId]);
+
+  const updateTeams = (updatedTeams: Teams) => {
+    setTeams(updatedTeams);
+    socket.emit('updateTeams', { preRefId, teams: updatedTeams });
+  };
 
   const reorder = (list: PreStory[], startIndex: number, endIndex: number): PreStory[] => {
     const result = Array.from(list);
@@ -32,7 +38,7 @@ const PreRefinement = () => {
 
     if (source.droppableId === destination.droppableId) {
       const items = reorder(teams[source.droppableId], source.index, destination.index);
-      setTeams({ ...teams, [source.droppableId]: items });
+      updateTeams({ ...teams, [source.droppableId]: items });
     } else {
       const sourceClone = Array.from(teams[source.droppableId]);
       const destClone = Array.from(teams[destination.droppableId]);
@@ -41,7 +47,7 @@ const PreRefinement = () => {
       removed.team = destination.droppableId;
       destClone.splice(destination.index, 0, removed);
 
-      setTeams({
+      updateTeams({
         ...teams,
         [source.droppableId]: sourceClone,
         [destination.droppableId]: destClone,
@@ -85,9 +91,9 @@ const PreRefinement = () => {
       const cloned = { ...teams };
       const createdPreStory = { name: String(name).trim(), link, id: nanoid(6) };
       cloned['Stories'].unshift(createdPreStory);
-      setTeams(cloned);
+      updateTeams(cloned);
 
-      socket.emit('addPreStory', createdPreStory);
+      socket.emit('addPreStory', { ...createdPreStory, preRefId: preRefId ?? nanoid(6) });
       (document.getElementById('story-name') as HTMLInputElement).value = '';
       (document.getElementById('story-link') as HTMLInputElement).value = '';
     }
@@ -98,6 +104,7 @@ const PreRefinement = () => {
 
     socket.on('initPreRefinement', (preRefinement) => {
       setTeams({ ...preRefinement.teams });
+      setPreRefId(preRefinement.id);
     });
 
     socket.on('updatePreRefinement', (preRefinement) => {
