@@ -1,11 +1,10 @@
 const { updateRefinement, updateUsers, deleteRefinement, fetchRefinements } = require('../repository/refinement');
 const { updatePreRefinement, fetchPreRefinement } = require('../repository/pre-refinement');
 
-module.exports = ({ io, server }) => {
-  io.on('connection', async (socket) => {
-    const refinements = await fetchRefinements();
-    const preRefinement = await fetchPreRefinement();
-
+module.exports = async ({ io, server }) => {
+  let refinements = await fetchRefinements();
+  let preRefinement = await fetchPreRefinement();
+  io.on('connection', (socket) => {
     // Handle user joining
     socket.on('join', ({ username, refinementId }) => {
       const refinementIndex = refinements.findIndex((ref) => ref.id === refinementId);
@@ -19,11 +18,13 @@ module.exports = ({ io, server }) => {
       }
     });
 
-    socket.on('getRefinements', () => {
-      io.emit('initRefinements', refinements);
+    socket.on('getRefinements', async () => {
+      refinements = await fetchRefinements();
+      if (refinements.length) io.emit('initRefinements', refinements);
     });
 
-    socket.on('getPreRefinement', () => {
+    socket.on('getPreRefinement', async () => {
+      preRefinement = await fetchPreRefinement();
       if (preRefinement) io.emit('initPreRefinement', preRefinement);
     });
 
