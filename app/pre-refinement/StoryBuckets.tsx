@@ -81,10 +81,10 @@ const StoryBuckets = ({ teams }: Props) => {
                         {story.link ? (
                           <span className="flex flex-col">
                             <Link
-                              className="rounded-full bg-blue-500 px-3 mx-1 text-white text-sm shadow-xl"
+                              title="Open Jira Link"
+                              className="rounded-full bg-blue-500 px-3 mx-1 text-white text-sm shadow-xl cursor-pointer"
                               href={story.link}
                               target="_blank"
-                              title="Open Jira Link"
                             >
                               jira
                             </Link>

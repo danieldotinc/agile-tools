@@ -78,16 +78,14 @@ const StoryDetails = ({ onClose }: Props) => {
               Octopus
             </span>
             {story?.link ? (
-              <span className="">
-                <Link
-                  className="rounded-full bg-blue-500 px-3 py-1 mx-1 text-white text-sm shadow-xl"
-                  href={story.link}
-                  target="_blank"
-                  title="Open Jira Link"
-                >
-                  jira
-                </Link>
-              </span>
+              <Link
+                className="rounded-full bg-blue-500 px-3 py-1 mx-1 text-white text-sm shadow-xl cursor-pointer"
+                href={story.link}
+                target="_blank"
+                title="Open Jira Link"
+              >
+                jira
+              </Link>
             ) : null}
           </div>
           <form className="flex items-center mb-4 ">

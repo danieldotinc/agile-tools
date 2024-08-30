@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { FAKE_STORIES_1, FAKE_STORIES_2 } from './fake';
+import socket from '@/app/socket';
 
 export type PreStory = {
   id: string;
@@ -58,6 +58,7 @@ export const usePreRefinement = create<PreRefinement>((set) => ({
       }
       const clonedTeams = { ...state.teams };
       clonedTeams[team][storyIndex] = { ...story };
+      socket.emit('updateTeams', { preRefId: state.preRefId, teams: clonedTeams });
       return { teams: clonedTeams };
     }),
 }));
