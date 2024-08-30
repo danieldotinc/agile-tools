@@ -18,13 +18,13 @@ type Props = {
   teams: Teams;
 };
 
-const TEAM_COLOR = {
-  Joker: 'bg-red-400',
-  ScoobyDoo: 'bg-blue-400',
-  Mercury: 'bg-green-400',
-  Octopus: 'bg-yellow-400',
-  Futurama: 'bg-pink-400',
-};
+enum TEAM_COLOR {
+  Joker = 'bg-red-400',
+  ScoobyDoo = 'bg-blue-400',
+  Mercury = 'bg-green-400',
+  Octopus = 'bg-yellow-400',
+  Futurama = 'bg-pink-400',
+}
 
 const StoryBuckets = ({ teams }: Props) => {
   const [isStoryDetailVisible, setStoryDetailVisibility] = useState(false);
