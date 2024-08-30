@@ -18,6 +18,14 @@ type Props = {
   teams: Teams;
 };
 
+const TEAM_COLOR = {
+  Joker: 'bg-red-400',
+  ScoobyDoo: 'bg-blue-400',
+  Mercury: 'bg-green-400',
+  Octopus: 'bg-yellow-400',
+  Futurama: 'bg-pink-400',
+};
+
 const StoryBuckets = ({ teams }: Props) => {
   const [isStoryDetailVisible, setStoryDetailVisibility] = useState(false);
   const [selectedStory, setSelectedStory] = usePreRefinement((state) => [state.selectedStory, state.setDetailedStory]);
@@ -73,7 +81,7 @@ const StoryBuckets = ({ teams }: Props) => {
                         {story.link ? (
                           <span className="flex flex-col">
                             <Link
-                              className="rounded-full bg-blue-500 px-3 py-1 mx-1 text-white text-sm shadow-xl"
+                              className="rounded-full bg-blue-500 px-3 mx-1 text-white text-sm shadow-xl"
                               href={story.link}
                               target="_blank"
                               title="Open Jira Link"
@@ -90,15 +98,16 @@ const StoryBuckets = ({ teams }: Props) => {
                           className="fa-fw cursor-pointer"
                           size="lg"
                           onClick={() => handleStoryDetailsView(story, index)}
-                          title="Open Detail View"
+                          title="Open detail view"
                         />
                         <span className="flex items-center">
                           {!!story.comments ? (
                             <FontAwesomeIcon
                               size="lg"
                               icon={faComments}
+                              color="orange"
                               className="fa-fw cursor-pointer mr-2"
-                              title="See Comments"
+                              title="See comments"
                               onClick={() => handleStoryDetailsView(story, index)}
                             />
                           ) : (
@@ -128,7 +137,9 @@ const StoryBuckets = ({ teams }: Props) => {
                           )}
                           {!!story.team ? (
                             <span
-                              className={`rounded-full bg-white p-1 text-black font-mono text-xs shadow-xl mr-1 cursor-pointer`}
+                              className={`rounded-full ${
+                                TEAM_COLOR[story.team.split('-')[0]]
+                              } p-1 text-black font-mono text-xs shadow-xl mr-1 cursor-pointer`}
                               onClick={() => handleStoryDetailsView(story, index)}
                               title="This is the assigned team"
                             >
