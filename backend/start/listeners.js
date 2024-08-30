@@ -1,6 +1,6 @@
-const { updateRefinement, updateUsers, deleteRefinement } = require('../repository');
+const { updateRefinement, updateUsers, deleteRefinement } = require('../repository/refinement');
 
-module.exports = ({ io, server, data: refinements }) => {
+module.exports = ({ io, server, data: { refinements, preRefinement } }) => {
   io.on('connection', (socket) => {
     console.log('a user connected', socket.id);
 
@@ -19,6 +19,10 @@ module.exports = ({ io, server, data: refinements }) => {
 
     socket.on('getRefinements', () => {
       io.emit('initRefinements', refinements);
+    });
+
+    socket.on('getPreRefinement', () => {
+      if (preRefinement) io.emit('initPreRefinement', preRefinement);
     });
 
     socket.on('getRefinement', ({ id }) => {

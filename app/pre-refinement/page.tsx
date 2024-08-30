@@ -1,6 +1,7 @@
 'use client';
-import { useEffect } from 'react';
+import { FormEvent, useEffect } from 'react';
 import { DragDropContext, OnDragEndResponder } from 'react-beautiful-dnd';
+import { nanoid } from 'nanoid';
 
 import socket from '@/app/socket';
 import { useAuthContext } from '@/app/context/AuthContext';
@@ -76,28 +77,38 @@ const PreRefinement = () => {
     'Octopus-D': [...(teams['Octopus-D'] ?? [])],
   });
 
-  // useEffect(() => {
-  //   socket.emit('getPreRefinement');
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const name = (document.getElementById('story-name') as HTMLInputElement).value;
+    const link = (document.getElementById('story-link') as HTMLInputElement).value;
+    if (String(name).trim()) {
+      const cloned = { ...teams };
+      const createdPreStory = { name: String(name).trim(), link, id: nanoid(6) };
+      cloned['Stories'].unshift(createdPreStory);
+      setTeams(cloned);
 
-  //   socket.on('initPreRefinement', ({ preRefinement }) => {
-  //     setTeams({
-  //       ...teams,
-  //       Stories: preRefinement.stories,
-  //     });
-  //   });
+      socket.emit('addPreStory', createdPreStory);
+      (document.getElementById('story-name') as HTMLInputElement).value = '';
+      (document.getElementById('story-link') as HTMLInputElement).value = '';
+    }
+  };
 
-  //   socket.on('updatePreRefinement', (preRefinement) => {
-  //     setTeams({
-  //       ...teams,
-  //       Stories: preRefinement.stories,
-  //     });
-  //   });
+  useEffect(() => {
+    socket.emit('getPreRefinement');
 
-  //   return () => {
-  //     socket.off('initPreRefinement');
-  //     socket.off('updatePreRefinement');
-  //   };
-  // }, []);
+    socket.on('initPreRefinement', (preRefinement) => {
+      setTeams({ ...preRefinement.teams });
+    });
+
+    socket.on('updatePreRefinement', (preRefinement) => {
+      setTeams({ ...preRefinement.teams });
+    });
+
+    return () => {
+      socket.off('initPreRefinement');
+      socket.off('updatePreRefinement');
+    };
+  }, []);
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
@@ -106,7 +117,7 @@ const PreRefinement = () => {
           {isAdmin && (
             <div className="flex-1 mb-10">
               <div className="mt-4 ">
-                <form>
+                <form onSubmit={handleSubmit}>
                   <input
                     type="text"
                     placeholder="Story Name"

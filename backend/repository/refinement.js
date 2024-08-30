@@ -23,4 +23,4 @@ const updateUsers = async (refinements) => {
   }
 };
 
-module.exports = { fetchRefinements, updateRefinement, deleteRefinement, updateUsers };
+module.exports = { updateUsers, deleteRefinement, updateRefinement, fetchRefinements };

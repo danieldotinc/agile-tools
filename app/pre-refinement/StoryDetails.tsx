@@ -35,7 +35,7 @@ const StoryDetails = ({ onClose }: Props) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
-      <form className="bg-gray-800 rounded shadow-lg">
+      <div className="bg-gray-800 rounded shadow-lg">
         <span className="flex justify-end p-3">
           <FontAwesomeIcon icon={faXmarkCircle} className="fa-fw cursor-pointer" size="xl" onClick={onClose} />
         </span>
@@ -90,7 +90,7 @@ const StoryDetails = ({ onClose }: Props) => {
               </span>
             ) : null}
           </div>
-          <div className="flex items-center mb-4 ">
+          <form className="flex items-center mb-4 ">
             <input
               type="text"
               value={assigned}
@@ -98,7 +98,7 @@ const StoryDetails = ({ onClose }: Props) => {
               className="border border-gray-500 rounded font-mono shadow-xl"
               placeholder=" assign to..."
             />
-            <button className="bg-blue-500 text-white p-1 mx-2 rounded text-xs" onClick={handleAssign}>
+            <button type="submit" className="bg-blue-500 text-white p-1 mx-2 rounded text-xs" onClick={handleAssign}>
               assign
             </button>
             {story?.assigned ? (
@@ -106,8 +106,8 @@ const StoryDetails = ({ onClose }: Props) => {
                 Assigned to: <span className="text-prominent">{story.assigned}</span>
               </span>
             ) : null}
-          </div>
-          <div className="flex items-center">
+          </form>
+          <form className="flex items-center">
             <input
               type="text"
               value={comment}
@@ -115,10 +115,10 @@ const StoryDetails = ({ onClose }: Props) => {
               className="border w-3/4 border-gray-500 font-mono rounded shadow-xl"
               placeholder=" comment..."
             />
-            <button className="bg-blue-500 text-white p-1 mx-2 rounded text-xs" onClick={handleComment}>
+            <button type="submit" className="bg-blue-500 text-white p-1 mx-2 rounded text-xs" onClick={handleComment}>
               comment
             </button>
-          </div>
+          </form>
           <div className="mt-5">
             {story?.comments?.map((comment, index) => (
               <p className="p-1 font-mono text-md">
@@ -127,7 +127,7 @@ const StoryDetails = ({ onClose }: Props) => {
             ))}
           </div>
         </div>
-      </form>
+      </div>
     </div>
   );
 };
