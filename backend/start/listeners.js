@@ -164,6 +164,20 @@ module.exports = async ({ io, server }) => {
       updatePreRefinement(preRef);
     });
 
+    socket.on('updateStory', ({ story }) => {
+      updateStory({ id: story.id, ...story });
+    });
+
+    socket.on('updateStories', ({ refinementId, stories }) => {
+      const refinementIndex = refinements.findIndex((ref) => ref.id === refinementId);
+      const refinement = refinements[refinementIndex];
+      if (refinement) {
+        refinement.stories = stories;
+        updateRefinement({ id: refinementId, stories });
+        io.emit('updateRefinement', refinement);
+      }
+    });
+
     socket.on('revealVotes', ({ refinementId }) => {
       const refinementIndex = refinements.findIndex((ref) => ref.id === refinementId);
       const refinement = refinements[refinementIndex];

@@ -2,25 +2,23 @@
 import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXmarkCircle } from '@fortawesome/free-solid-svg-icons';
-import { usePreRefinement } from '../store/pre-refinement';
 import Link from 'next/link';
+import { Story } from '../store/story';
 
 type Props = {
+  story: Story;
+  onStoryUpdate: (story: Story) => void;
   onClose: () => void;
 };
 
-const StoryDetails = ({ onClose }: Props) => {
-  const [story, setSelectedStory] = usePreRefinement((state) => [state.selectedStory, state.setDetailedStory]);
+const StoryDetails = ({ story, onClose, onStoryUpdate }: Props) => {
   const [comment, setComment] = useState('');
   const [assigned, setAssigned] = useState('');
-
-  const updateStory = usePreRefinement((state) => state.updateStory);
 
   const handleAssign = (e: React.MouseEvent) => {
     e.preventDefault();
     const updated = { ...story!, assigned };
-    setSelectedStory(updated);
-    updateStory(updated);
+    onStoryUpdate(updated);
     setAssigned('');
   };
 
@@ -28,8 +26,7 @@ const StoryDetails = ({ onClose }: Props) => {
     e.preventDefault();
     const updatedComments = story!.comments ? [...story!.comments, comment] : [comment];
     const updated = { ...story!, comments: updatedComments };
-    setSelectedStory(updated);
-    updateStory(updated);
+    onStoryUpdate(updated);
     setComment('');
   };
 

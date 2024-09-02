@@ -2,10 +2,13 @@
 import Image from 'next/image';
 import UserCardType from './UserCardType';
 import React, { useState } from 'react';
+import { useRefinement } from '../store/refinement';
 
-const UserCards = ({ users, stories, currentIndex }) => {
+const UserCards = ({ currentIndex }) => {
+  const [stories, users] = useRefinement((state) => [state.stories, state.users]);
+
   const [cardType, setCardType] = useState(localStorage.getItem('card') ?? 'card');
-  const revealed = stories[currentIndex].revealed;
+  const revealed = stories[currentIndex]?.revealed;
 
   const getCard = (vote) => {
     if (vote && !revealed) return 'back-2';

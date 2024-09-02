@@ -7,7 +7,7 @@ import socket from '@/app/socket';
 import { useAuthContext } from '@/app/context/AuthContext';
 
 import PreStoryBuckets from './PreStoryBuckets';
-import PreStoryDetails from './PreStoryDetails';
+import StoryDetails from '../components/StoryDetails';
 
 import { Story } from '../store/story';
 import { usePreRefinement, Teams } from '../store/pre-refinement';
@@ -20,6 +20,7 @@ type PreRefinement = {
 const PreRefinement = () => {
   const { isAdmin } = useAuthContext();
 
+  const updateStory = usePreRefinement((state) => state.updateStory);
   const [isStoryDetailVisible, setStoryDetailVisibility] = useState(false);
   const [teams, setTeams] = usePreRefinement((state) => [state.teams, state.setTeams]);
   const [preRefId, setPreRefId] = usePreRefinement((state) => [state.preRefId, state.setPreRefId]);
@@ -111,6 +112,11 @@ const PreRefinement = () => {
     setStoryDetailVisibility(!isStoryDetailVisible);
   };
 
+  const handleStoryUpdate = (story: Story) => {
+    setSelectedStory(story);
+    updateStory(story);
+  };
+
   useEffect(() => {
     socket.emit('getPreRefinement');
 
@@ -132,7 +138,11 @@ const PreRefinement = () => {
   return (
     <>
       {isStoryDetailVisible && !!selectedStory && (
-        <PreStoryDetails onClose={() => handleStoryDetailsView(selectedStory, 0)} />
+        <StoryDetails
+          story={selectedStory}
+          onStoryUpdate={handleStoryUpdate}
+          onClose={() => handleStoryDetailsView(selectedStory, 0)}
+        />
       )}
 
       <DragDropContext onDragEnd={onDragEnd}>

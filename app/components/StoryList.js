@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Link from 'next/link';
 import React from 'react';
 import { useDrag, useDrop } from 'react-dnd';
+import { useRefinement } from '../store/refinement';
 
 const ItemType = 'STORY';
 
@@ -15,7 +16,7 @@ const TEAM_COLOR = {
   Futurama: 'bg-pink-400',
 };
 
-const StoryItem = ({ story, index, moveStory, onStorySelect, currentIndex }) => {
+const StoryItem = ({ story, index, moveStory, onStorySelect, onDetailView, currentIndex }) => {
   const ref = React.useRef(null);
 
   const [, drop] = useDrop({
@@ -68,7 +69,7 @@ const StoryItem = ({ story, index, moveStory, onStorySelect, currentIndex }) => 
           icon={faMagnifyingGlass}
           className="fa-fw cursor-pointer"
           size="lg"
-          // onClick={() => handleStoryDetailsView(story, index)}
+          onClick={() => onDetailView(story, index)}
           title="Open detail view"
         />
         <span className="flex items-center">
@@ -79,7 +80,7 @@ const StoryItem = ({ story, index, moveStory, onStorySelect, currentIndex }) => 
               color="orange"
               className="fa-fw cursor-pointer mr-2"
               title="See comments"
-              // onClick={() => handleStoryDetailsView(story, index)}
+              onClick={() => onDetailView(story, index)}
             />
           ) : (
             <FontAwesomeIcon
@@ -87,13 +88,13 @@ const StoryItem = ({ story, index, moveStory, onStorySelect, currentIndex }) => 
               icon={faCommentMedical}
               className="fa-fw cursor-pointer mr-2"
               title="Add a comment"
-              // onClick={() => handleStoryDetailsView(story, index)}
+              onClick={() => onDetailView(story, index)}
             />
           )}
           {!!story.assigned ? (
             <span
               className={`rounded-full bg-prominent p-1 text-black font-mono text-xs shadow-xl mr-1 cursor-pointer`}
-              // onClick={() => handleStoryDetailsView(story, index)}
+              onClick={() => onDetailView(story, index)}
             >
               {story.assigned}
             </span>
@@ -103,7 +104,7 @@ const StoryItem = ({ story, index, moveStory, onStorySelect, currentIndex }) => 
               icon={faUserNinja}
               className="fa-fw cursor-pointer mr-2"
               title="Assign a Ninja"
-              // onClick={() => handleStoryDetailsView(story, index)}
+              onClick={() => onDetailView(story, index)}
             />
           )}
           {!!story.team ? (
@@ -111,7 +112,7 @@ const StoryItem = ({ story, index, moveStory, onStorySelect, currentIndex }) => 
               className={`rounded-full ${
                 TEAM_COLOR[story.team.split('-')[0]]
               } p-1 text-black font-mono text-xs shadow-xl mr-2 cursor-pointer`}
-              // onClick={() => handleStoryDetailsView(story, index)}
+              onClick={() => onDetailView(story, index)}
               title="This is the assigned team"
             >
               {story.team?.split('-')[0]}
@@ -123,9 +124,10 @@ const StoryItem = ({ story, index, moveStory, onStorySelect, currentIndex }) => 
   );
 };
 
-const StoryList = ({ refinement, onStorySelect, currentIndex, onReorder, noStyling = false }) => {
+const StoryList = ({ onStorySelect, currentIndex, onDetailView, onReorder, noStyling = false }) => {
+  const [name, stories] = useRefinement((state) => [state.name, state.stories]);
   const moveStory = (fromIndex, toIndex) => {
-    const updatedStories = Array.from(refinement.stories);
+    const updatedStories = Array.from(stories);
     const [movedStory] = updatedStories.splice(fromIndex, 1);
     updatedStories.splice(toIndex, 0, movedStory);
     onReorder(updatedStories, toIndex);
@@ -135,16 +137,17 @@ const StoryList = ({ refinement, onStorySelect, currentIndex, onReorder, noStyli
     <div className={`${!noStyling ? 'w-1/4 p-4 border-r' : ''}`} style={{ flexBasis: '25%' }}>
       {!noStyling ? (
         <h2 className="text-lg font-bold mb-4">
-          Stories : <span className="text-prominent">{refinement?.name}</span>
+          Stories : <span className="text-prominent">{name}</span>
         </h2>
       ) : null}
       <ul>
-        {refinement?.stories.map((story, index) => (
+        {stories.map((story, index) => (
           <StoryItem
             key={story.name}
             index={index}
             story={story}
             moveStory={moveStory}
+            onDetailView={onDetailView}
             onStorySelect={onStorySelect}
             currentIndex={currentIndex}
           />
