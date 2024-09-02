@@ -36,12 +36,14 @@ const Home = ({ params }: Props) => {
     if (username) socket.emit('join', { username, refinementId: id });
 
     socket.on('initRefinement', ({ refinement }) => {
-      setRefinement(refinement);
+      if (refinement.id === id) setRefinement(refinement);
     });
 
     socket.on('updateRefinement', (refinement) => {
-      setRefinement(refinement);
-      setUserChangedIndex(null);
+      if (refinement.id === id) {
+        setRefinement(refinement);
+        setUserChangedIndex(null);
+      }
     });
 
     return () => {

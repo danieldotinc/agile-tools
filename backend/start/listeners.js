@@ -153,6 +153,7 @@ module.exports = async ({ io, server }) => {
       if (refinement) {
         refinement.stories[refinement.currentIndex].votes[username] = card;
         io.emit('updateRefinement', refinement);
+        updateRefinement({ id: refinement.id, stories: refinement.stories });
       }
     });
 
@@ -173,8 +174,8 @@ module.exports = async ({ io, server }) => {
       const refinement = refinements[refinementIndex];
       if (refinement) {
         refinement.stories = stories;
-        updateRefinement({ id: refinementId, stories });
         io.emit('updateRefinement', refinement);
+        updateRefinement({ id: refinementId, stories });
       }
     });
 
@@ -245,6 +246,7 @@ module.exports = async ({ io, server }) => {
       refinement.currentIndex = index;
 
       io.emit('updateRefinement', refinement);
+      updateRefinement({ id: refinement.id, currentIndex });
     });
 
     socket.on('reorderStories', ({ refinementId, stories }) => {
@@ -255,7 +257,7 @@ module.exports = async ({ io, server }) => {
       refinement.stories = stories;
 
       io.emit('updateRefinement', refinement);
-      updateRefinement(refinement);
+      updateRefinement({ id: refinement, stories: refinement.stories });
     });
 
     socket.on('nextStory', ({ refinementId }) => {
@@ -266,6 +268,7 @@ module.exports = async ({ io, server }) => {
       if (refinement.currentIndex < refinement.stories.length - 1) {
         refinement.currentIndex += 1;
         io.emit('updateRefinement', refinement);
+        updateRefinement({ id: refinement.id, currentIndex });
       }
     });
 
@@ -277,6 +280,7 @@ module.exports = async ({ io, server }) => {
       if (refinement.currentIndex > 0) {
         refinement.currentIndex -= 1;
         io.emit('updateRefinement', refinement);
+        updateRefinement({ id: refinement.id, currentIndex });
       }
     });
 
