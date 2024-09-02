@@ -42,7 +42,7 @@ const Home = ({ params }) => {
 
   const addStory = (name, link) => {
     if (String(name).trim()) {
-      socket.emit('addStory', { id: nanoid(6), name: String(name).trim(), link, refinementId: id });
+      socket.emit('addStory', { id: nanoid(10), name: String(name).trim(), link, refinementId: id });
       document.getElementById('story-name').value = '';
       document.getElementById('story-link').value = '';
     }

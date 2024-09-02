@@ -1,32 +1,6 @@
 const mongoose = require('mongoose');
 const { Schema } = require('mongoose');
-
-const preStorySchema = new Schema(
-  {
-    id: {
-      type: String,
-      required: true,
-    },
-    name: {
-      type: String,
-      required: true,
-    },
-    comments: {
-      type: [String],
-      default: [],
-    },
-    team: {
-      type: String,
-    },
-    link: {
-      type: String,
-    },
-    assigned: {
-      type: String,
-    },
-  },
-  { minimize: false }
-);
+const { storySchema } = require('./Story');
 
 const preRefinementSchema = new Schema(
   {
@@ -36,7 +10,7 @@ const preRefinementSchema = new Schema(
     },
     teams: {
       type: Map,
-      of: [preStorySchema],
+      of: [storySchema],
       default: {},
     },
   },

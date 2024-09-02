@@ -14,7 +14,7 @@ import {
   faUserNinja,
 } from '@fortawesome/free-solid-svg-icons';
 
-import StoryDetails from './StoryDetails';
+import PreStoryDetails from './PreStoryDetails';
 import { Teams, PreStory, usePreRefinement } from '../store/pre-refinement';
 
 type Props = {
@@ -29,7 +29,7 @@ enum TEAM_COLOR {
   Futurama = 'bg-pink-400',
 }
 
-const StoryBuckets = ({ teams }: Props) => {
+const PreStoryBuckets = ({ teams }: Props) => {
   const [isStoryDetailVisible, setStoryDetailVisibility] = useState(false);
   const [selectedStory, setSelectedStory] = usePreRefinement((state) => [state.selectedStory, state.setDetailedStory]);
   const grid = 8;
@@ -74,7 +74,7 @@ const StoryBuckets = ({ teams }: Props) => {
   return (
     <>
       {isStoryDetailVisible && !!selectedStory && (
-        <StoryDetails onClose={() => handleStoryDetailsView(selectedStory, 0)} />
+        <PreStoryDetails onClose={() => handleStoryDetailsView(selectedStory, 0)} />
       )}
       {Object.keys(teams).map((bucket) => (
         <Droppable droppableId={bucket} key={bucket}>
@@ -202,4 +202,4 @@ const StoryBuckets = ({ teams }: Props) => {
   );
 };
 
-export default StoryBuckets;
+export default PreStoryBuckets;

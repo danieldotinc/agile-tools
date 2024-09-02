@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { storySchema } = require('./Story');
 
 const refinementSchema = new mongoose.Schema(
   {
@@ -20,19 +21,7 @@ const refinementSchema = new mongoose.Schema(
       default: [],
     },
     stories: {
-      type: [
-        {
-          id: { type: String },
-          link: { type: String },
-          team: { type: String },
-          assigned: { type: String },
-          comments: { type: [String], default: [] },
-          votes: { type: Object, default: {} },
-          name: { type: String, required: true },
-          revealed: { type: Boolean, default: false },
-          result: { type: mongoose.Schema.Types.Mixed, default: null },
-        },
-      ],
+      type: [storySchema],
       default: [],
     },
     currentIndex: {

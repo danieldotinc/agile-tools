@@ -6,7 +6,7 @@ import { nanoid } from 'nanoid';
 import socket from '@/app/socket';
 import { useAuthContext } from '@/app/context/AuthContext';
 
-import StoryBuckets from './StoryBuckets';
+import PreStoryBuckets from './PreStoryBuckets';
 import { usePreRefinement, PreStory, Teams } from '../store/pre-refinement';
 
 type PreRefinement = {
@@ -89,7 +89,7 @@ const PreRefinement = () => {
     const link = (document.getElementById('story-link') as HTMLInputElement).value;
     if (String(name).trim()) {
       const cloned = { ...teams };
-      const createdPreStory = { name: String(name).trim(), link, id: nanoid(6) };
+      const createdPreStory = { name: String(name).trim(), link, id: nanoid(10) };
       cloned['Stories'].unshift(createdPreStory);
       updateTeams(cloned);
 
@@ -147,25 +147,25 @@ const PreRefinement = () => {
               </div>
             </div>
           )}
-          <StoryBuckets teams={filterTeamBuckets()} />
+          <PreStoryBuckets teams={filterTeamBuckets()} />
         </div>
         <div className="flex w-1/4 p-4 border-r flex-col">
           <div className="flex justify-center text-xl font-mono font-semibold mb-10 pb-2 border-y-2 border-t-0 border-b-prominent">
             <span className="text-red-400 mr-2">Ready</span>for Pre-Refinement
           </div>
-          <StoryBuckets teams={getReadyTeams()} />
+          <PreStoryBuckets teams={getReadyTeams()} />
         </div>
         <div className="flex w-1/4 p-4 border-r flex-col">
           <div className="flex justify-center text-xl font-mono font-semibold mb-10 pb-2 border-y-2 border-t-0 border-b-prominent">
             Pre-Refinement <span className="text-blue-400 ml-2"> In-Progress</span>
           </div>
-          <StoryBuckets teams={getProgressTeams()} />
+          <PreStoryBuckets teams={getProgressTeams()} />
         </div>
         <div className="flex w-1/4 p-4 flex-col">
           <div className="flex justify-center text-xl font-mono font-semibold mb-10 pb-2 border-y-2 border-t-0 border-b-prominent">
             <span className="text-green-500 mr-2">Ready</span> for Refinement
           </div>
-          <StoryBuckets teams={getDoneTeams()} />
+          <PreStoryBuckets teams={getDoneTeams()} />
         </div>
       </div>
     </DragDropContext>

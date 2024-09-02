@@ -6,7 +6,6 @@ const fetchPreRefinement = async () => {
 };
 
 const updatePreRefinement = async (preRef) => {
-  console.log('updating pre-refinement...');
   await PreRefinement.updateOne({ id: preRef.id }, { $set: { teams: { ...preRef.teams } } }, { upsert: true });
 };
 
