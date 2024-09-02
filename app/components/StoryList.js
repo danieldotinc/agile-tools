@@ -77,7 +77,7 @@ const StoryItem = ({ story, index, moveStory, onStorySelect, onDetailView, curre
             <FontAwesomeIcon
               size="lg"
               icon={faComments}
-              color="orange"
+              color={index === currentIndex ? 'darkgray' : 'orange'}
               className="fa-fw cursor-pointer mr-2"
               title="See comments"
               onClick={() => onDetailView(story, index)}
@@ -93,7 +93,9 @@ const StoryItem = ({ story, index, moveStory, onStorySelect, onDetailView, curre
           )}
           {!!story.assigned ? (
             <span
-              className={`rounded-full bg-prominent p-1 text-black font-mono text-xs shadow-xl mr-1 cursor-pointer`}
+              className={`rounded-full ${
+                index === currentIndex ? 'bg-gray-400' : 'bg-prominent'
+              } p-1 text-black font-mono text-xs shadow-xl mr-1 cursor-pointer`}
               onClick={() => onDetailView(story, index)}
             >
               {story.assigned}
@@ -116,6 +118,15 @@ const StoryItem = ({ story, index, moveStory, onStorySelect, onDetailView, curre
               title="This is the assigned team"
             >
               {story.team?.split('-')[0]}
+            </span>
+          ) : null}
+          {!!story.result ? (
+            <span
+              className={`rounded-full bg-white p-1 text-black font-mono text-xs shadow-xl mr-2 cursor-pointer`}
+              onClick={() => onDetailView(story, index)}
+              title="This is the assigned team"
+            >
+              {story.result}
             </span>
           ) : null}
         </span>

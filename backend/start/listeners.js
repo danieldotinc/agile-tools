@@ -45,7 +45,7 @@ module.exports = async ({ io, server }) => {
 
     socket.on('getRefinement', ({ id }) => {
       const refinement = refinements.find((ref) => ref.id === id);
-      if (refinement) io.emit('initRefinement', { refinement });
+      if (refinement) io.emit('initRefinement', refinement);
     });
 
     socket.on('addRefinement', ({ name, id }) => {
@@ -62,14 +62,28 @@ module.exports = async ({ io, server }) => {
       deleteRefinement(id);
     });
 
+    socket.on('deletePreRefStory', ({ story, preRefId }) => {
+      const preRef = { ...preRefinement };
+      const teamName = story.team || 'Stories';
+      if (!preRef.teams[teamName] || preRefId !== preRef.id) return;
+
+      const storyIndex = preRef.teams[teamName].findIndex((st) => st.id === story.id);
+      if (storyIndex === -1) return;
+
+      preRef.teams[teamName].splice(storyIndex, 1);
+
+      io.emit('updatePreRefinement', preRef);
+      updatePreRefinement(preRef);
+      deleteStory(story.id);
+    });
+
     socket.on('addStory', async (story) => {
-      const { id, link, name, refinementId } = story;
+      const { id, link, name, team, refinementId } = story;
       const refinementIndex = refinements.findIndex((ref) => ref.id === refinementId);
       const refinement = refinements[refinementIndex];
       if (refinement) {
-        const generatedStory = generateStory({ id, name, link, refinementId });
+        const generatedStory = generateStory({ id, name, link, team, refinementId });
         const createdStory = await updateStory(generatedStory);
-        console.log(createdStory);
         refinement.stories.push(createdStory);
         io.emit('updateRefinement', refinement);
         updateRefinement({ id: refinement.id, stories: refinement.stories });
@@ -110,8 +124,8 @@ module.exports = async ({ io, server }) => {
       updatePreRefinement(preRef);
     });
 
-    socket.on('sendStoryToRefinement', async (preStory) => {
-      const { id, name, link, team, assigned, comments, refinementId } = preStory;
+    socket.on('sendStoryToRefinement', async (story) => {
+      const { id, name, link, team, assigned, comments, refinementId } = story;
       if (!team) return;
 
       const teamName = team.split('-')[0];
@@ -123,7 +137,7 @@ module.exports = async ({ io, server }) => {
           ? generateRefinement(refinementId, `${teamName} Refinement`)
           : refinements[refinementIndex];
 
-      const story = await updateStory({
+      const updatedStory = await updateStory({
         id,
         name,
         link,
@@ -133,18 +147,19 @@ module.exports = async ({ io, server }) => {
         comments,
       });
 
-      refinement.stories.push(story);
+      refinement.stories.push(updatedStory);
 
-      refinements.unshift(refinement);
+      if (refinementIndex === -1) refinements.unshift(refinement);
+
       updateRefinement(refinement);
 
-      const preRef = await fetchPreRefinement();
-      if (!preRef) return;
+      preRefinement = await fetchPreRefinement();
+      if (!preRefinement) return;
 
-      const preStoryIndex = preRef.teams[team].findIndex((st) => st.id === id);
-      preRef.teams[team].splice(preStoryIndex, 1);
-      io.emit('updatePreRefinement', preRef);
-      updatePreRefinement(preRef);
+      const storyIndex = preRefinement.teams[team].findIndex((st) => st.id === id);
+      preRefinement.teams[team].splice(storyIndex, 1);
+      io.emit('updatePreRefinement', preRefinement);
+      updatePreRefinement(preRefinement);
     });
 
     socket.on('vote', ({ refinementId, username, card }) => {
@@ -165,7 +180,7 @@ module.exports = async ({ io, server }) => {
       updatePreRefinement(preRef);
     });
 
-    socket.on('updateStory', ({ story }) => {
+    socket.on('updateStory', (story) => {
       updateStory({ id: story.id, ...story });
     });
 
@@ -223,15 +238,16 @@ module.exports = async ({ io, server }) => {
       updateRefinement({ id: refinement.id, stories: refinement.stories });
     });
 
-    socket.on('deleteStory', ({ refinementId, index }) => {
+    socket.on('deleteStory', ({ refinementId, story }) => {
       const refinementIndex = refinements.findIndex((ref) => ref.id === refinementId);
       const refinement = refinements[refinementIndex];
       if (!refinement) return;
 
-      const story = refinement.stories[index];
+      const storyIndex = refinement.stories.findIndex((st) => st.id === story.id);
+      if (storyIndex === -1) return;
 
-      refinement.stories.splice(index, 1);
-      refinement.currentIndex = index === 0 ? 0 : refinement.currentIndex - 1;
+      refinement.stories.splice(storyIndex, 1);
+      refinement.currentIndex = storyIndex === 0 ? 0 : refinement.currentIndex - 1;
 
       io.emit('updateRefinement', refinement);
       if (story.id) deleteStory(story.id);
@@ -246,7 +262,7 @@ module.exports = async ({ io, server }) => {
       refinement.currentIndex = index;
 
       io.emit('updateRefinement', refinement);
-      updateRefinement({ id: refinement.id, currentIndex });
+      updateRefinement({ id: refinement.id, currentIndex: index });
     });
 
     socket.on('reorderStories', ({ refinementId, stories }) => {

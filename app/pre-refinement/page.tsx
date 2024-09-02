@@ -11,6 +11,7 @@ import StoryDetails from '../components/StoryDetails';
 
 import { Story } from '../store/story';
 import { usePreRefinement, Teams } from '../store/pre-refinement';
+import DeletePrompt from '../components/DeletePrompt';
 
 type PreRefinement = {
   currentIndex: number;
@@ -20,6 +21,7 @@ type PreRefinement = {
 const PreRefinement = () => {
   const { isAdmin } = useAuthContext();
 
+  const [toBeDeletedStory, setToBeDeleted] = useState<Story | null>(null);
   const updateStory = usePreRefinement((state) => state.updateStory);
   const [isStoryDetailVisible, setStoryDetailVisibility] = useState(false);
   const [teams, setTeams] = usePreRefinement((state) => [state.teams, state.setTeams]);
@@ -117,6 +119,13 @@ const PreRefinement = () => {
     updateStory(story);
   };
 
+  const handleDelete = () => {
+    socket.emit('deletePreRefStory', { story: { ...toBeDeletedStory }, preRefId });
+    setToBeDeleted(null);
+    setSelectedStory(undefined);
+    setStoryDetailVisibility(false);
+  };
+
   useEffect(() => {
     socket.emit('getPreRefinement');
 
@@ -141,9 +150,12 @@ const PreRefinement = () => {
         <StoryDetails
           story={selectedStory}
           onStoryUpdate={handleStoryUpdate}
+          onDelete={(story) => setToBeDeleted(story)}
           onClose={() => handleStoryDetailsView(selectedStory, 0)}
         />
       )}
+
+      {!!toBeDeletedStory && <DeletePrompt onCancel={() => setToBeDeleted(null)} onDelete={handleDelete} />}
 
       <DragDropContext onDragEnd={onDragEnd}>
         <div className="flex flex-1">
@@ -154,12 +166,14 @@ const PreRefinement = () => {
                   <form onSubmit={handleSubmit}>
                     <input
                       type="text"
+                      autoComplete="off"
                       placeholder="Story Name"
                       className="border p-2 mr-2 rounded w-full"
                       id="story-name"
                     />
                     <input
                       type="text"
+                      autoComplete="off"
                       placeholder="Story Link (optional)"
                       className="border p-2 mr-2 mt-2 mb-2 rounded w-full"
                       id="story-link"

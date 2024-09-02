@@ -58,6 +58,7 @@ const Page = () => {
                 type="text"
                 placeholder="Refinement Name"
                 className="flex-1 border p-2 mr-2 rounded"
+                autoComplete="off"
                 id="refinement-name"
               />
               <button type="submit" className=" bg-yellow-500 text-black px-4 rounded">

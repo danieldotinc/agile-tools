@@ -45,7 +45,7 @@ export const usePreRefinement = create<PreRefinement>((set) => ({
       const storyIndex = clonedTeam.findIndex((st) => st.id === story.id);
       if (storyIndex === -1) {
         console.log('error: story not found');
-        return;
+        return {};
       }
       const clonedTeams = { ...state.teams };
       clonedTeams[team][storyIndex] = { ...story };

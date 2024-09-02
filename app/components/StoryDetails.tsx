@@ -3,15 +3,19 @@ import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXmarkCircle } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
+
 import { Story } from '../store/story';
+import { useAuthContext } from '../context/AuthContext';
 
 type Props = {
   story: Story;
   onStoryUpdate: (story: Story) => void;
+  onDelete: (story: Story) => void;
   onClose: () => void;
 };
 
-const StoryDetails = ({ story, onClose, onStoryUpdate }: Props) => {
+const StoryDetails = ({ story, onClose, onStoryUpdate, onDelete }: Props) => {
+  const { isAdmin } = useAuthContext();
   const [comment, setComment] = useState('');
   const [assigned, setAssigned] = useState('');
 
@@ -92,6 +96,7 @@ const StoryDetails = ({ story, onClose, onStoryUpdate }: Props) => {
               onChange={(e) => setAssigned(e.target.value)}
               className="border border-gray-500 rounded font-mono shadow-xl"
               placeholder=" assign to..."
+              autoComplete="off"
             />
             <button type="submit" className="bg-blue-500 text-white p-1 mx-2 rounded text-xs" onClick={handleAssign}>
               assign
@@ -109,6 +114,7 @@ const StoryDetails = ({ story, onClose, onStoryUpdate }: Props) => {
               onChange={(e) => setComment(e.target.value)}
               className="border w-3/4 border-gray-500 font-mono rounded shadow-xl"
               placeholder=" comment..."
+              autoComplete="off"
             />
             <button type="submit" className="bg-blue-500 text-white p-1 mx-2 rounded text-xs" onClick={handleComment}>
               comment
@@ -122,6 +128,13 @@ const StoryDetails = ({ story, onClose, onStoryUpdate }: Props) => {
             ))}
           </div>
         </div>
+        {isAdmin && (
+          <span className="flex justify-end p-3">
+            <span className="text-red-600 cursor-pointer" onClick={() => onDelete(story)}>
+              delete
+            </span>
+          </span>
+        )}
       </div>
     </div>
   );

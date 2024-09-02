@@ -25,37 +25,43 @@ const Loading = ({ isLoading }: { isLoading: boolean }) => {
         <FontAwesomeIcon
           icon={faVolleyball}
           className="fa-bounce mr-3"
-          style={{
-            '--fa-bounce-height': `-${random(30, 150)}px`,
-            '--fa-animation-duration': '1s',
-          }}
+          style={
+            {
+              '--fa-bounce-height': `-${random(30, 150)}px`,
+              '--fa-animation-duration': '1s',
+            } as any
+          }
         />
         <FontAwesomeIcon
           icon={faFrog}
           className="fa-bounce mr-3"
           color="lightgreen"
-          style={{
-            '--fa-bounce-start-scale-x': '1',
-            '--fa-bounce-start-scale-y': '1',
-            '--fa-bounce-jump-scale-x': '1',
-            '--fa-bounce-jump-scale-y': '1',
-            '--fa-bounce-land-scale-x': '1.2',
-            '--fa-bounce-land-scale-y': '0.8',
-            '--fa-bounce-height': `-${random(50, 160)}px`,
-            '--fa-animation-duration': '1s',
-          }}
+          style={
+            {
+              '--fa-bounce-start-scale-x': '1',
+              '--fa-bounce-start-scale-y': '1',
+              '--fa-bounce-jump-scale-x': '1',
+              '--fa-bounce-jump-scale-y': '1',
+              '--fa-bounce-land-scale-x': '1.2',
+              '--fa-bounce-land-scale-y': '0.8',
+              '--fa-bounce-height': `-${random(50, 160)}px`,
+              '--fa-animation-duration': '1s',
+            } as any
+          }
         />
         <FontAwesomeIcon
           icon={faBasketball}
           className="fa-bounce mr-3"
           color="orange"
-          style={{
-            '--fa-bounce-land-scale-x': '1.2',
-            '--fa-bounce-land-scale-y': '0.8',
-            '--fa-bounce-rebound': '5px',
-            '--fa-bounce-height': `-${random(10, 180)}px`,
-            '--fa-animation-duration': '1s',
-          }}
+          style={
+            {
+              '--fa-bounce-land-scale-x': '1.2',
+              '--fa-bounce-land-scale-y': '0.8',
+              '--fa-bounce-rebound': '5px',
+              '--fa-bounce-height': `-${random(10, 180)}px`,
+              '--fa-animation-duration': '1s',
+            } as any
+          }
         />
       </div>
     )

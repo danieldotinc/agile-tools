@@ -7,7 +7,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCommentMedical,
   faComments,
-  faForward,
   faMagnifyingGlass,
   faPaperPlane,
   faUserNinja,
@@ -51,16 +50,16 @@ const StoryBuckets = ({ teams, onStorySelect }: Props) => {
     borderRadius: '8px',
   });
 
-  const handleSendingToRefinement = (preStory: Story) =>
-    socket.emit('sendStoryToRefinement', { ...preStory, refinementId: nanoid(6) });
+  const handleSendingToRefinement = (story: Story) =>
+    socket.emit('sendStoryToRefinement', { ...story, refinementId: nanoid(6) });
 
-  const handleMovingToDone = (story: Story, index: number) => {
-    return;
-  };
+  // const handleMovingToDone = (story: Story, index: number) => {
+  //   return;
+  // };
 
-  const handleMovingToProgress = (story: Story, index: number) => {
-    return;
-  };
+  // const handleMovingToProgress = (story: Story, index: number) => {
+  //   return;
+  // };
 
   return Object.keys(teams).map((bucket) => (
     <Droppable droppableId={bucket} key={bucket}>
@@ -74,7 +73,7 @@ const StoryBuckets = ({ teams, onStorySelect }: Props) => {
                   ref={provided.innerRef}
                   {...provided.draggableProps}
                   {...provided.dragHandleProps}
-                  style={getItemStyle(snapshot.isDragging, provided.draggableProps.style)}
+                  style={getItemStyle(snapshot.isDragging, provided.draggableProps.style) as any}
                 >
                   <span className="flex flex-row justify-between">
                     {story.name}
@@ -138,7 +137,7 @@ const StoryBuckets = ({ teams, onStorySelect }: Props) => {
                       {!!story.team ? (
                         <span
                           className={`rounded-full ${
-                            TEAM_COLOR[story.team.split('-')[0]]
+                            TEAM_COLOR[story.team.split('-')[0] as keyof typeof TEAM_COLOR]
                           } p-1 text-black font-mono text-xs shadow-xl mr-2 cursor-pointer`}
                           onClick={() => onStorySelect(story, index)}
                           title="This is the assigned team"
@@ -155,7 +154,7 @@ const StoryBuckets = ({ teams, onStorySelect }: Props) => {
                           onClick={() => handleSendingToRefinement(story)}
                         />
                       ) : null}
-                      {!!story.team && story.team.includes('-P') ? (
+                      {/* {!!story.team && story.team.includes('-P') ? (
                         <FontAwesomeIcon
                           size="lg"
                           icon={faForward}
@@ -172,7 +171,7 @@ const StoryBuckets = ({ teams, onStorySelect }: Props) => {
                           title={`Move to in-progress column`}
                           onClick={() => handleMovingToProgress(story, index)}
                         />
-                      ) : null}
+                      ) : null} */}
                     </span>
                   </span>
                 </div>

@@ -47,7 +47,7 @@ export const useRefinement = create<Refinement>((set) => ({
       const storyIndex = clonedStories.findIndex((st) => st.id === story.id);
       if (storyIndex === -1) {
         console.log('error: story not found');
-        return;
+        return {};
       }
       socket.emit('updateStory', story);
 
