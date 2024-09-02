@@ -29,7 +29,7 @@ enum TEAM_COLOR {
   Futurama = 'bg-pink-400',
 }
 
-const PreStoryBuckets = ({ teams, onStorySelect }: Props) => {
+const StoryBuckets = ({ teams, onStorySelect }: Props) => {
   const grid = 8;
 
   const getItemStyle = (isDragging: boolean, draggableStyle: DraggingStyle | NotDraggingStyle | undefined) => ({
@@ -186,4 +186,4 @@ const PreStoryBuckets = ({ teams, onStorySelect }: Props) => {
   ));
 };
 
-export default PreStoryBuckets;
+export default StoryBuckets;
