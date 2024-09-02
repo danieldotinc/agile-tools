@@ -1,5 +1,5 @@
 'use client';
-import { FormEvent, useEffect } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { DragDropContext, OnDragEndResponder } from 'react-beautiful-dnd';
 import { nanoid } from 'nanoid';
 
@@ -7,25 +7,30 @@ import socket from '@/app/socket';
 import { useAuthContext } from '@/app/context/AuthContext';
 
 import PreStoryBuckets from './PreStoryBuckets';
-import { usePreRefinement, PreStory, Teams } from '../store/pre-refinement';
+import PreStoryDetails from './PreStoryDetails';
+
+import { Story } from '../store/story';
+import { usePreRefinement, Teams } from '../store/pre-refinement';
 
 type PreRefinement = {
   currentIndex: number;
-  stories: PreStory[];
+  stories: Story[];
 };
 
 const PreRefinement = () => {
   const { isAdmin } = useAuthContext();
 
+  const [isStoryDetailVisible, setStoryDetailVisibility] = useState(false);
   const [teams, setTeams] = usePreRefinement((state) => [state.teams, state.setTeams]);
   const [preRefId, setPreRefId] = usePreRefinement((state) => [state.preRefId, state.setPreRefId]);
+  const [selectedStory, setSelectedStory] = usePreRefinement((state) => [state.selectedStory, state.setDetailedStory]);
 
   const updateTeams = (updatedTeams: Teams) => {
     setTeams(updatedTeams);
     socket.emit('updateTeams', { preRefId, teams: updatedTeams });
   };
 
-  const reorder = (list: PreStory[], startIndex: number, endIndex: number): PreStory[] => {
+  const reorder = (list: Story[], startIndex: number, endIndex: number): Story[] => {
     const result = Array.from(list);
     const [removed] = result.splice(startIndex, 1);
     result.splice(endIndex, 0, removed);
@@ -99,6 +104,13 @@ const PreRefinement = () => {
     }
   };
 
+  const handleStoryDetailsView = (story: Story, index: number) => {
+    if (!isStoryDetailVisible) setSelectedStory({ ...story, index });
+    else setSelectedStory(undefined);
+
+    setStoryDetailVisibility(!isStoryDetailVisible);
+  };
+
   useEffect(() => {
     socket.emit('getPreRefinement');
 
@@ -118,57 +130,63 @@ const PreRefinement = () => {
   }, []);
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <div className="flex flex-1">
-        <div className="w-1/4 p-4 border-r">
-          {isAdmin && (
-            <div className="flex-1 mb-10">
-              <div className="mt-4 ">
-                <form onSubmit={handleSubmit}>
-                  <input
-                    type="text"
-                    placeholder="Story Name"
-                    className="border p-2 mr-2 rounded w-full"
-                    id="story-name"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Story Link (optional)"
-                    className="border p-2 mr-2 mt-2 mb-2 rounded w-full"
-                    id="story-link"
-                  />
-                  <div className="flex justify-between">
-                    <button type="submit" className=" bg-slate-600 text-white p-2 mr-2 rounded">
-                      Create
-                    </button>
-                    {/* <button className="bg-red-500 text-white p-2 rounded">Delete</button> */}
-                  </div>
-                </form>
+    <>
+      {isStoryDetailVisible && !!selectedStory && (
+        <PreStoryDetails onClose={() => handleStoryDetailsView(selectedStory, 0)} />
+      )}
+
+      <DragDropContext onDragEnd={onDragEnd}>
+        <div className="flex flex-1">
+          <div className="w-1/4 p-4 border-r">
+            {isAdmin && (
+              <div className="flex-1 mb-10">
+                <div className="mt-4 ">
+                  <form onSubmit={handleSubmit}>
+                    <input
+                      type="text"
+                      placeholder="Story Name"
+                      className="border p-2 mr-2 rounded w-full"
+                      id="story-name"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Story Link (optional)"
+                      className="border p-2 mr-2 mt-2 mb-2 rounded w-full"
+                      id="story-link"
+                    />
+                    <div className="flex justify-between">
+                      <button type="submit" className=" bg-slate-600 text-white p-2 mr-2 rounded">
+                        Create
+                      </button>
+                      {/* <button className="bg-red-500 text-white p-2 rounded">Delete</button> */}
+                    </div>
+                  </form>
+                </div>
               </div>
+            )}
+            <PreStoryBuckets onStorySelect={handleStoryDetailsView} teams={filterTeamBuckets()} />
+          </div>
+          <div className="flex w-1/4 p-4 border-r flex-col">
+            <div className="flex justify-center text-xl font-mono font-semibold mb-10 pb-2 border-y-2 border-t-0 border-b-prominent">
+              <span className="text-red-400 mr-2">Ready</span>for Pre-Refinement
             </div>
-          )}
-          <PreStoryBuckets teams={filterTeamBuckets()} />
-        </div>
-        <div className="flex w-1/4 p-4 border-r flex-col">
-          <div className="flex justify-center text-xl font-mono font-semibold mb-10 pb-2 border-y-2 border-t-0 border-b-prominent">
-            <span className="text-red-400 mr-2">Ready</span>for Pre-Refinement
+            <PreStoryBuckets onStorySelect={handleStoryDetailsView} teams={getReadyTeams()} />
           </div>
-          <PreStoryBuckets teams={getReadyTeams()} />
-        </div>
-        <div className="flex w-1/4 p-4 border-r flex-col">
-          <div className="flex justify-center text-xl font-mono font-semibold mb-10 pb-2 border-y-2 border-t-0 border-b-prominent">
-            Pre-Refinement <span className="text-blue-400 ml-2"> In-Progress</span>
+          <div className="flex w-1/4 p-4 border-r flex-col">
+            <div className="flex justify-center text-xl font-mono font-semibold mb-10 pb-2 border-y-2 border-t-0 border-b-prominent">
+              Pre-Refinement <span className="text-blue-400 ml-2"> In-Progress</span>
+            </div>
+            <PreStoryBuckets onStorySelect={handleStoryDetailsView} teams={getProgressTeams()} />
           </div>
-          <PreStoryBuckets teams={getProgressTeams()} />
-        </div>
-        <div className="flex w-1/4 p-4 flex-col">
-          <div className="flex justify-center text-xl font-mono font-semibold mb-10 pb-2 border-y-2 border-t-0 border-b-prominent">
-            <span className="text-green-500 mr-2">Ready</span> for Refinement
+          <div className="flex w-1/4 p-4 flex-col">
+            <div className="flex justify-center text-xl font-mono font-semibold mb-10 pb-2 border-y-2 border-t-0 border-b-prominent">
+              <span className="text-green-500 mr-2">Ready</span> for Refinement
+            </div>
+            <PreStoryBuckets onStorySelect={handleStoryDetailsView} teams={getDoneTeams()} />
           </div>
-          <PreStoryBuckets teams={getDoneTeams()} />
         </div>
-      </div>
-    </DragDropContext>
+      </DragDropContext>
+    </>
   );
 };
 

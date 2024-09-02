@@ -1,26 +1,17 @@
 import { create } from 'zustand';
 import socket from '@/app/socket';
+import { Story } from './story';
 
-export type PreStory = {
-  id: string;
-  name: string;
-  comments?: string[];
-  team?: string;
-  link?: string;
-  index?: number;
-  assigned?: string;
-};
-
-export type Teams = Record<string, PreStory[]>;
+export type Teams = Record<string, Story[]>;
 
 type PreRefinement = {
   teams: Teams;
   preRefId?: string;
-  selectedStory?: PreStory;
+  selectedStory?: Story;
   setTeams: (teams: Teams) => void;
   setPreRefId: (id: string) => void;
-  updateStory: (story: PreStory) => void;
-  setDetailedStory: (story?: PreStory) => void;
+  updateStory: (story: Story) => void;
+  setDetailedStory: (story?: Story) => void;
 };
 
 export const usePreRefinement = create<PreRefinement>((set) => ({
@@ -46,8 +37,8 @@ export const usePreRefinement = create<PreRefinement>((set) => ({
   },
   setTeams: (teams: Teams) => set((state) => ({ teams: { ...teams } })),
   setPreRefId: (id: string) => set((state) => ({ preRefId: id })),
-  setDetailedStory: (story?: PreStory) => set((state) => ({ selectedStory: story })),
-  updateStory: (story: PreStory) =>
+  setDetailedStory: (story?: Story) => set((state) => ({ selectedStory: story })),
+  updateStory: (story: Story) =>
     set((state) => {
       const team = story.team ?? 'Stories';
       const clonedTeam = [...state.teams[team]];
