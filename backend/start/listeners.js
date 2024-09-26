@@ -273,7 +273,7 @@ module.exports = async ({ io, server }) => {
       refinement.stories = stories;
 
       io.emit('updateRefinement', refinement);
-      updateRefinement({ id: refinement, stories: refinement.stories });
+      updateRefinement({ id: refinementId, stories: refinement.stories });
     });
 
     socket.on('nextStory', ({ refinementId }) => {

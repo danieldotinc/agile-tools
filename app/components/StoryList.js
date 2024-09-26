@@ -3,8 +3,8 @@ import { faCommentMedical, faComments, faMagnifyingGlass, faUserNinja } from '@f
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Link from 'next/link';
 import React from 'react';
-import { useDrag, useDrop } from 'react-dnd';
 import { useRefinement } from '../store/refinement';
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 
 const ItemType = 'STORY';
 
@@ -16,37 +16,13 @@ const TEAM_COLOR = {
   Futurama: 'bg-pink-400',
 };
 
-const StoryItem = ({ story, index, moveStory, onStorySelect, onDetailView, currentIndex }) => {
-  const ref = React.useRef(null);
-
-  const [, drop] = useDrop({
-    accept: ItemType,
-    hover(item) {
-      if (item.index !== index) {
-        moveStory(item.index, index);
-        item.index = index;
-      }
-    },
-  });
-
-  const [{ isDragging }, drag] = useDrag({
-    type: ItemType,
-    item: { index },
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
-    }),
-  });
-
-  drag(drop(ref));
-
+const StoryItem = ({ story, index, onStorySelect, onDetailView, currentIndex }) => {
   return (
     <li
-      ref={ref}
       className={`mb-2 p-2 rounded flex flex-col space-between cursor-pointer ${
         index === currentIndex ? 'bg-prominent text-background' : 'bg-opposite text-white'
       }`}
       onClick={() => onStorySelect(index)}
-      style={{ opacity: isDragging ? 0.5 : 1 }}
     >
       <span className="flex flex-row justify-between">
         {story.name}
@@ -137,11 +113,26 @@ const StoryItem = ({ story, index, moveStory, onStorySelect, onDetailView, curre
 
 const StoryList = ({ onStorySelect, currentIndex, onDetailView, onReorder, noStyling = false }) => {
   const [name, stories] = useRefinement((state) => [state.name, state.stories]);
-  const moveStory = (fromIndex, toIndex) => {
-    const updatedStories = Array.from(stories);
-    const [movedStory] = updatedStories.splice(fromIndex, 1);
-    updatedStories.splice(toIndex, 0, movedStory);
-    onReorder(updatedStories, toIndex);
+
+  const getItemStyle = (isDragging, draggableStyle) => ({
+    ...draggableStyle,
+  });
+
+  const reorder = (list, startIndex, endIndex) => {
+    const result = Array.from(list);
+    const [removed] = result.splice(startIndex, 1);
+    result.splice(endIndex, 0, removed);
+    return result;
+  };
+
+  const onDragEnd = (result) => {
+    const { source, destination } = result;
+    if (!destination) return;
+
+    if (source.droppableId === destination.droppableId) {
+      const items = reorder(stories, source.index, destination.index);
+      onReorder(items, destination.index);
+    }
   };
 
   return (
@@ -151,19 +142,35 @@ const StoryList = ({ onStorySelect, currentIndex, onDetailView, onReorder, noSty
           Stories : <span className="text-prominent">{name}</span>
         </h2>
       ) : null}
-      <ul>
-        {stories.map((story, index) => (
-          <StoryItem
-            key={story.name}
-            index={index}
-            story={story}
-            moveStory={moveStory}
-            onDetailView={onDetailView}
-            onStorySelect={onStorySelect}
-            currentIndex={currentIndex}
-          />
-        ))}
-      </ul>
+      <DragDropContext onDragEnd={onDragEnd}>
+        <Droppable droppableId="a" key="a">
+          {(provided, snapshot) => (
+            <ul ref={provided.innerRef} {...provided.droppableProps}>
+              {stories.map((story, index) => (
+                <Draggable key={story.id} draggableId={story.id} index={index}>
+                  {(provided, snapshot) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                      style={getItemStyle(snapshot.isDragging, provided.draggableProps.style)}
+                    >
+                      <StoryItem
+                        key={story.name}
+                        index={index}
+                        story={story}
+                        onDetailView={onDetailView}
+                        onStorySelect={onStorySelect}
+                        currentIndex={currentIndex}
+                      />
+                    </div>
+                  )}
+                </Draggable>
+              ))}
+            </ul>
+          )}
+        </Droppable>
+      </DragDropContext>
     </div>
   );
 };
