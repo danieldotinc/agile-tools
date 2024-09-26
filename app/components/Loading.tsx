@@ -18,13 +18,14 @@ const Loading = ({ isLoading }: { isLoading: boolean }) => {
   return (
     visible && (
       <div
-        className={`fa-3x fixed inset-0 flex items-center justify-center bg-slate-800 bg-opacity-100 z-50 transition-opacity duration-500 ${
+        className={`fa-3x fixed inset-0 flex items-center justify-center bg-white bg-opacity-100 z-50 transition-opacity duration-500 ${
           isLoading ? 'opacity-100' : 'opacity-0'
         }`}
       >
         <FontAwesomeIcon
           icon={faVolleyball}
           className="fa-bounce mr-3"
+          color="#ffb703"
           style={
             {
               '--fa-bounce-height': `-${random(30, 150)}px`,
@@ -52,7 +53,7 @@ const Loading = ({ isLoading }: { isLoading: boolean }) => {
         <FontAwesomeIcon
           icon={faBasketball}
           className="fa-bounce mr-3"
-          color="orange"
+          color="#fb8500"
           style={
             {
               '--fa-bounce-land-scale-x': '1.2',

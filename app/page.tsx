@@ -42,12 +42,12 @@ export default function Home() {
             {apps.map((example, index) => (
               <div
                 key={example.heading}
-                className={`shadow-md hover:shadow-3xl cursor-pointer rounded-lg border p-4 hover:bg-gray-100 border-gray-200 ${
+                className={`shadow-md hover:shadow-xl cursor-pointer rounded-lg border p-4 hover:bg-gray-100 border-gray-200 ${
                   index > 1 && 'hidden md:block'
                 }`}
                 onClick={() => !!example.link && router.push(example.link)}
               >
-                <div className="text-lg">{example.heading}</div>
+                <div className="text-xl ">{example.heading}</div>
                 <div className="text-lg text-zinc-500">{example.subheading}</div>
                 <div className={`text-lg ${example.ready ? 'text-orange-500' : 'text-red-700'}`}>
                   <pre>{example.message}</pre>
