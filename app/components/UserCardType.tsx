@@ -17,7 +17,7 @@ const UserCardType = ({ onCardTypeChange }: { onCardTypeChange: (cardType: strin
       <label className="inline-flex items-center cursor-pointer">
         <input type="checkbox" className="hidden" checked={isCard} onChange={handleToggle} />
         <span
-          className={`w-10 h-6 flex items-center  rounded-full p-1 duration-300 ease-in-out ${
+          className={`w-10 h-6 flex items-center  rounded-full p-1 duration-300 ease-in-out${
             isCard ? 'bg-prominent' : 'bg-gray-300'
           }`}
         >

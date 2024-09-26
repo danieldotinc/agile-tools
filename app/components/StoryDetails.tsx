@@ -36,13 +36,13 @@ const StoryDetails = ({ story, onClose, onStoryUpdate, onDelete }: Props) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
-      <div className="bg-gray-800 rounded shadow-lg w-1/2">
+      <div className="bg-gray-800 rounded shadow-lg w-2/5">
         <span className="flex justify-end p-3">
           <FontAwesomeIcon icon={faXmarkCircle} className="fa-fw cursor-pointer" size="xl" onClick={onClose} />
         </span>
         <div className="flex flex-col p-8 pt-2">
           <h2 className="text-xl mb-4">{story?.name}</h2>
-          <div className="mb-5">
+          <div className="mb-5 flex flex-wrap">
             <span
               className={`rounded-full ${
                 story?.team?.includes('Joker') ? 'bg-prominent' : 'bg-gray-500'
