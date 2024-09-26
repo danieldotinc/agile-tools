@@ -168,18 +168,18 @@ const PreRefinement = () => {
                       type="text"
                       autoComplete="off"
                       placeholder="Story Name"
-                      className="border p-2 mr-2 rounded w-full"
+                      className="border p-2 mr-2 rounded w-full border-gray-200"
                       id="story-name"
                     />
                     <input
                       type="text"
                       autoComplete="off"
                       placeholder="Story Link (optional)"
-                      className="border p-2 mr-2 mt-2 mb-2 rounded w-full"
+                      className="border p-2 mr-2 mt-2 mb-2 rounded w-full border-gray-200"
                       id="story-link"
                     />
                     <div className="flex justify-between">
-                      <button type="submit" className=" bg-slate-600 text-white p-2 mr-2 rounded">
+                      <button type="submit" className=" bg-[#023047] text-white p-2 mr-2 rounded">
                         Create
                       </button>
                       {/* <button className="bg-red-500 text-white p-2 rounded">Delete</button> */}

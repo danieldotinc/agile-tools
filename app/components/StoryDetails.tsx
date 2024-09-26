@@ -36,7 +36,7 @@ const StoryDetails = ({ story, onClose, onStoryUpdate, onDelete }: Props) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
-      <div className="bg-gray-800 rounded shadow-lg w-2/5">
+      <div className="bg-white rounded shadow-lg w-2/5">
         <span className="flex justify-end p-3">
           <FontAwesomeIcon icon={faXmarkCircle} className="fa-fw cursor-pointer" size="xl" onClick={onClose} />
         </span>
@@ -45,35 +45,35 @@ const StoryDetails = ({ story, onClose, onStoryUpdate, onDelete }: Props) => {
           <div className="mb-5 flex flex-wrap">
             <span
               className={`rounded-full ${
-                story?.team?.includes('Joker') ? 'bg-prominent' : 'bg-gray-500'
+                story?.team?.includes('Joker') ? 'bg-prominent' : 'bg-gray-200'
               } px-3 py-1 text-black text-sm font-mono shadow-xl mr-1`}
             >
               Joker
             </span>
             <span
               className={`rounded-full ${
-                story?.team?.includes('ScoobyDoo') ? 'bg-prominent' : 'bg-gray-500'
+                story?.team?.includes('ScoobyDoo') ? 'bg-prominent' : 'bg-gray-200'
               } px-3 py-1 text-black font-mono text-sm shadow-xl mr-1`}
             >
               ScoobyDoo
             </span>
             <span
               className={`rounded-full ${
-                story?.team?.includes('Mercury') ? 'bg-prominent' : 'bg-gray-500'
+                story?.team?.includes('Mercury') ? 'bg-prominent' : 'bg-gray-200'
               } px-3 py-1 text-black font-mono text-sm shadow-xl mr-1`}
             >
               Mercury
             </span>
             <span
               className={`rounded-full ${
-                story?.team?.includes('Futurama') ? 'bg-prominent' : 'bg-gray-500'
+                story?.team?.includes('Futurama') ? 'bg-prominent' : 'bg-gray-200'
               } px-3 py-1 text-black font-mono text-sm shadow-xl mr-1`}
             >
               Futurama
             </span>
             <span
               className={`rounded-full ${
-                story?.team?.includes('Octopus') ? 'bg-prominent' : 'bg-gray-500'
+                story?.team?.includes('Octopus') ? 'bg-prominent' : 'bg-gray-200'
               } px-3 py-1 text-black font-mono text-sm shadow-xl mr-1`}
             >
               Octopus
@@ -94,7 +94,7 @@ const StoryDetails = ({ story, onClose, onStoryUpdate, onDelete }: Props) => {
               type="text"
               value={assigned}
               onChange={(e) => setAssigned(e.target.value)}
-              className="border border-gray-500 rounded font-mono shadow-xl"
+              className="border border-gray-300 rounded font-mono  text-black"
               placeholder=" assign to..."
               autoComplete="off"
             />
@@ -112,7 +112,7 @@ const StoryDetails = ({ story, onClose, onStoryUpdate, onDelete }: Props) => {
               type="text"
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              className="border w-3/4 border-gray-500 font-mono rounded shadow-xl"
+              className="border w-3/4 border-gray-300 font-mono rounded "
               placeholder=" comment..."
               autoComplete="off"
             />

@@ -34,8 +34,8 @@ const StoryBuckets = ({ teams, onStorySelect }: Props) => {
   const getItemStyle = (isDragging: boolean, draggableStyle: DraggingStyle | NotDraggingStyle | undefined) => ({
     padding: 10,
     margin: `0 0 ${grid}px 0`,
-    borderRadius: `8px`,
-    background: 'rgb(51 65 85)',
+    borderRadius: `12px`,
+    background: '#8ecae6',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-between',
@@ -46,7 +46,7 @@ const StoryBuckets = ({ teams, onStorySelect }: Props) => {
     // background: isDraggingOver ? 'darkgray' : 'dark',
     padding: grid,
     marginBottom: '30px',
-    borderLeft: `1px solid #fcba03`,
+    borderLeft: `3px solid #fb8500`,
     borderRadius: '8px',
   });
 
@@ -65,7 +65,7 @@ const StoryBuckets = ({ teams, onStorySelect }: Props) => {
     <Droppable droppableId={bucket} key={bucket}>
       {(provided, snapshot) => (
         <div ref={provided.innerRef} {...provided.droppableProps} style={getListStyle(snapshot.isDraggingOver)}>
-          <span className="text-lg font-mono text-prominent">{bucket.split('-')[0]}</span>
+          <span className="text-xl font-mono text-[#fb8500]">{bucket.split('-')[0]}</span>
           {teams[bucket].map((story: Story, index: number) => (
             <Draggable key={story.id} draggableId={story.id} index={index}>
               {(provided, snapshot) => (
@@ -105,7 +105,7 @@ const StoryBuckets = ({ teams, onStorySelect }: Props) => {
                           size="lg"
                           icon={faComments}
                           color="orange"
-                          className="fa-fw cursor-pointer mr-2"
+                          className="fa-fw cursor-pointer mr-2 "
                           title="See comments"
                           onClick={() => onStorySelect(story, index)}
                         />
@@ -120,7 +120,7 @@ const StoryBuckets = ({ teams, onStorySelect }: Props) => {
                       )}
                       {!!story.assigned ? (
                         <span
-                          className={`rounded-full bg-prominent p-1 text-black font-mono text-xs shadow-xl mr-1 cursor-pointer`}
+                          className={`rounded-full bg-[#ffb703] p-1 text-black font-mono text-xs shadow-md mr-1 cursor-pointer`}
                           onClick={() => onStorySelect(story, index)}
                         >
                           {story.assigned}
@@ -138,7 +138,7 @@ const StoryBuckets = ({ teams, onStorySelect }: Props) => {
                         <span
                           className={`rounded-full ${
                             TEAM_COLOR[story.team.split('-')[0] as keyof typeof TEAM_COLOR]
-                          } p-1 text-black font-mono text-xs shadow-xl mr-2 cursor-pointer`}
+                          } p-1 text-black font-mono text-xs shadow-md mr-2 cursor-pointer`}
                           onClick={() => onStorySelect(story, index)}
                           title="This is the assigned team"
                         >

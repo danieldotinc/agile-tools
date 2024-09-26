@@ -16,14 +16,10 @@ const UserCardType = ({ onCardTypeChange }: { onCardTypeChange: (cardType: strin
     <div className="flex items-center p-4">
       <label className="inline-flex items-center cursor-pointer">
         <input type="checkbox" className="hidden" checked={isCard} onChange={handleToggle} />
-        <span
-          className={`w-10 h-6 flex items-center  rounded-full p-1 duration-300 ease-in-out${
-            isCard ? 'bg-prominent' : 'bg-gray-300'
-          }`}
-        >
+        <span className={`bg-gray-300 w-10 h-6 flex items-center  rounded-full p-1 duration-300 ease-in-out`}>
           <span
-            className={`bg-white w-4 h-4 rounded-full shadow-md transform duration-300 ease-in-out ${
-              isCard ? 'translate-x-4 bg-black' : ''
+            className={`bg-gray-500 w-4 h-4 rounded-full shadow-md transform duration-300 ease-in-out ${
+              isCard ? 'translate-x-4' : ''
             }`}
           ></span>
         </span>

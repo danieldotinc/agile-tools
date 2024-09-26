@@ -20,9 +20,10 @@ export default function Home() {
       ready: true,
     },
     {
-      heading: 'Sprint Capacity',
-      subheading: 'Estimate capacity for next sprint?',
+      heading: 'Sprint Metrics',
+      subheading: 'Want to know how teams are doing?',
       message: 'under construction!',
+      link: '/metrics',
       ready: false,
     },
     {
@@ -41,14 +42,14 @@ export default function Home() {
             {apps.map((example, index) => (
               <div
                 key={example.heading}
-                className={`shadow-lg hover:shadow-3xl cursor-pointer rounded-lg border p-4 hover:bg-zinc-800 ${
+                className={`shadow-md hover:shadow-3xl cursor-pointer rounded-lg border p-4 hover:bg-gray-100 border-gray-200 ${
                   index > 1 && 'hidden md:block'
                 }`}
                 onClick={() => !!example.link && router.push(example.link)}
               >
                 <div className="text-lg">{example.heading}</div>
                 <div className="text-lg text-zinc-500">{example.subheading}</div>
-                <div className={`text-lg ${example.ready ? 'text-yellow-500' : 'text-red-700'}`}>
+                <div className={`text-lg ${example.ready ? 'text-orange-500' : 'text-red-700'}`}>
                   <pre>{example.message}</pre>
                 </div>
               </div>

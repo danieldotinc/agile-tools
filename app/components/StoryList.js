@@ -19,8 +19,8 @@ const TEAM_COLOR = {
 const StoryItem = ({ story, index, onStorySelect, onDetailView, currentIndex }) => {
   return (
     <li
-      className={`mb-2 p-2 rounded flex flex-col space-between cursor-pointer ${
-        index === currentIndex ? 'bg-prominent text-background' : 'bg-opposite text-white'
+      className={`mb-2 p-2 rounded-xl flex flex-col space-between cursor-pointer ${
+        index === currentIndex ? 'bg-[#ffb703] text-background' : 'bg-[#8ecae6] '
       }`}
       onClick={() => onStorySelect(index)}
     >
@@ -45,6 +45,7 @@ const StoryItem = ({ story, index, onStorySelect, onDetailView, currentIndex }) 
           icon={faMagnifyingGlass}
           className="fa-fw cursor-pointer"
           size="lg"
+          color="#023047"
           onClick={() => onDetailView(story, index)}
           title="Open detail view"
         />
@@ -53,7 +54,7 @@ const StoryItem = ({ story, index, onStorySelect, onDetailView, currentIndex }) 
             <FontAwesomeIcon
               size="lg"
               icon={faComments}
-              color={index === currentIndex ? 'darkgray' : 'orange'}
+              color={index === currentIndex ? '#023047' : '#fb8500'}
               className="fa-fw cursor-pointer mr-2"
               title="See comments"
               onClick={() => onDetailView(story, index)}
@@ -65,13 +66,12 @@ const StoryItem = ({ story, index, onStorySelect, onDetailView, currentIndex }) 
               className="fa-fw cursor-pointer mr-2"
               title="Add a comment"
               onClick={() => onDetailView(story, index)}
+              color="#023047"
             />
           )}
           {!!story.assigned ? (
             <span
-              className={`rounded-full ${
-                index === currentIndex ? 'bg-gray-400' : 'bg-prominent'
-              } p-1 text-black font-mono text-xs shadow-xl mr-1 cursor-pointer`}
+              className={`rounded-full bg-[#023047] p-1 text-white font-mono text-xs shadow-sm mr-1 cursor-pointer`}
               onClick={() => onDetailView(story, index)}
             >
               {story.assigned}
@@ -82,6 +82,7 @@ const StoryItem = ({ story, index, onStorySelect, onDetailView, currentIndex }) 
               icon={faUserNinja}
               className="fa-fw cursor-pointer mr-2"
               title="Assign a Ninja"
+              color="#023047"
               onClick={() => onDetailView(story, index)}
             />
           )}
@@ -89,7 +90,7 @@ const StoryItem = ({ story, index, onStorySelect, onDetailView, currentIndex }) 
             <span
               className={`rounded-full ${
                 TEAM_COLOR[story.team.split('-')[0]]
-              } p-1 text-black font-mono text-xs shadow-xl mr-2 cursor-pointer`}
+              } p-1 text-black font-mono text-xs shadow-sm mr-2 cursor-pointer`}
               onClick={() => onDetailView(story, index)}
               title="This is the assigned team"
             >
@@ -139,7 +140,7 @@ const StoryList = ({ onStorySelect, currentIndex, onDetailView, onReorder, noSty
     <div className={`${!noStyling ? 'w-1/4 p-4 border-r' : ''}`} style={{ flexBasis: '25%' }}>
       {!noStyling ? (
         <h2 className="text-lg font-bold mb-4">
-          Stories : <span className="text-prominent">{name}</span>
+          Stories : <span className="text-[#fb8500]">{name}</span>
         </h2>
       ) : null}
       <DragDropContext onDragEnd={onDragEnd}>

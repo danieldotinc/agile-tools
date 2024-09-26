@@ -57,21 +57,21 @@ const Page = () => {
               <input
                 type="text"
                 placeholder="Refinement Name"
-                className="flex-1 border p-2 mr-2 rounded"
+                className="shadow-md flex-1 border p-2 mr-2 rounded border-gray-200"
                 autoComplete="off"
                 id="refinement-name"
               />
-              <button type="submit" className=" bg-yellow-500 text-black px-4 rounded">
+              <button type="submit" className="shadow-md bg-yellow-500 text-black px-4 rounded">
                 Create
               </button>
             </form>
           )}
-          <div className="mt-4 mb-4 grid grid-cols-3 gap-2 px-4 sm:px-0">
+          <div className="mt-4 mb-4 flex gap-2 px-4 sm:px-0 flex-wrap  justify-center">
             {refinements.length ? (
               refinements.map((refinement, index) => (
                 <div
                   key={refinement.id}
-                  className={`shadow-lg hover:shadow-3xl rounded-lg border p-4 hover:bg-zinc-800 ${
+                  className={`w-[30%] shadow-md hover:shadow-xl rounded-lg border border-gray-200 p-4 hover:bg-gray-100 ${
                     index > 1 && 'hidden md:block'
                   }`}
                 >
@@ -83,7 +83,7 @@ const Page = () => {
                   </div>
                   <div className="flex flex-col">
                     <span
-                      className="py-1 text-sm text-yellow-500 cursor-pointer"
+                      className="py-1 text-sm text-[#fb8500] cursor-pointer"
                       onClick={() => !!refinement.id && router.push(`/refinement/${refinement.id}`)}
                     >
                       Refinement-ID: {refinement.id}

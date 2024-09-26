@@ -1,8 +1,6 @@
 'use client';
 import { useState, useEffect, FormEvent } from 'react';
 import { nanoid } from 'nanoid';
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
 
 import socket from '@/app/socket';
 import Link from 'next/link';
@@ -133,28 +131,27 @@ const Home = ({ params }: Props) => {
       {!!toBeDeletedStory && <DeletePrompt onCancel={() => setToBeDeleted(null)} onDelete={handleDelete} />}
 
       <div className="flex flex-1">
-        <DndProvider backend={HTML5Backend}>
-          <StoryList
-            onDetailView={handleStoryDetailsView}
-            onStorySelect={storySelect}
-            onReorder={handleReorder}
-            currentIndex={currentIdx}
-          />
-        </DndProvider>
+        <StoryList
+          onDetailView={handleStoryDetailsView}
+          onStorySelect={storySelect}
+          onReorder={handleReorder}
+          currentIndex={currentIdx}
+        />
+
         <div className="flex-1 flex flex-col p-4">
           {isAdmin && (
             <div className="flex-1 mb-4">
-              <button onClick={prevStory} className="mr-2 bg-gray-400 text-white p-2 rounded">
+              <button onClick={prevStory} className="mr-2 bg-[#023047] text-white p-2 rounded">
                 {'<'}
               </button>
-              <button onClick={nextStory} className="mr-10 bg-gray-400 text-white p-2 rounded">
+              <button onClick={nextStory} className="mr-10 bg-[#023047] text-white p-2 rounded">
                 {'>'}
               </button>
 
               <button onClick={revealVotes} className="mr-2 bg-prominent text-background p-2 rounded">
                 Reveal
               </button>
-              <button onClick={revote} className="mr-10 bg-cyan-600 text-white p-2 rounded">
+              <button onClick={revote} className="mr-10 bg-[#219ebc] text-white p-2 rounded">
                 Revote
               </button>
 
@@ -166,18 +163,18 @@ const Home = ({ params }: Props) => {
                   <input
                     type="text"
                     placeholder="Story Name"
-                    className="flex-2 border p-2 mr-2 rounded"
+                    className="flex-2 border p-2 mr-2 rounded border-gray-300"
                     autoComplete="off"
                     id="story-name"
                   />
                   <input
                     type="text"
                     placeholder="Story Link (optional)"
-                    className="flex-2 border p-2 mr-2 rounded"
+                    className="flex-2 border p-2 mr-2 rounded border-gray-300"
                     autoComplete="off"
                     id="story-link"
                   />
-                  <button type="submit" className=" bg-slate-600 text-white p-2 rounded">
+                  <button type="submit" className=" bg-[#023047] text-white p-2 rounded">
                     Create
                   </button>
                 </form>
@@ -185,7 +182,7 @@ const Home = ({ params }: Props) => {
             </div>
           )}
           <div className="flex-1">
-            <h1 className="text-l font-mono mb-4 rounded bg-opposite text-white p-2 text-center m-6 mx-20">
+            <h1 className="text-l font-mono mb-4  bg-[#023047] text-black p-2 text-center m-6 mx-20 rounded-2xl text-white">
               Story: {stories[currentIdx]?.name || 'No story selected'}
               {!!stories[currentIdx]?.link && (
                 <span className="rounded-full bg-prominent p-1 mx-2 text-black text-xs">

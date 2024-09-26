@@ -1,13 +1,13 @@
 import Link from 'next/link';
 
 const Header = () => (
-  <header className="sticky top-0 z-40 flex items-center justify-between w-full h-16 px-4 border-b shrink-0 bg-gradient-to-b from-background/10 via-background/50 to-background/80 backdrop-blur-xl">
+  <header className="sticky top-0 z-40 flex items-center justify-between w-full h-16 px-4 border-b border-gray-200 mb-6">
     <div className="flex items-center">
       {/* <React.Suspense fallback={<div className="flex-1 overflow-auto" />}>
           <UserOrLogin />
         </React.Suspense> */}
-      <Link className="hidden sm:block text-yellow-500 font-mono font-bold" href="/">
-        R&D-tools
+      <Link className="hidden sm:block text-black text-xl font-mono font-bold" href="/">
+        AGILE-KIT
       </Link>
     </div>
     <div className="flex items-center justify-end space-x-2">
