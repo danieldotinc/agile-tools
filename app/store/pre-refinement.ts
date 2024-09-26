@@ -40,7 +40,7 @@ export const usePreRefinement = create<PreRefinement>((set) => ({
   setDetailedStory: (story?: Story) => set((state) => ({ selectedStory: story })),
   updateStory: (story: Story) =>
     set((state) => {
-      const team = story.team ?? 'Stories';
+      const team = story.team || 'Stories';
       const clonedTeam = [...state.teams[team]];
       const storyIndex = clonedTeam.findIndex((st) => st.id === story.id);
       if (storyIndex === -1) {
