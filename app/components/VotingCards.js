@@ -3,14 +3,14 @@ const VotingCards = ({ onVote, story, username }) => {
 
   return (
     <div className="flex justify-center space-x-4">
-      {cards.map(card => (
+      {cards.map((card) => (
         <button
           key={card}
           onClick={() => onVote(card)}
           className={`w-16 py-8 hover:transition hover:transform hover:-translate-y-6 ${
-            story.votes[username] == card ? '-translate-y-6' : ''
+            story?.votes[username] == card ? '-translate-y-6' : ''
           } hover:bg-amber-500 rounded text-xl ${
-            story.votes[username] == card ? 'bg-prominent' : 'bg-opposite text-white'
+            story?.votes[username] == card ? 'bg-prominent' : 'bg-opposite text-white'
           }`}
         >
           {card}
